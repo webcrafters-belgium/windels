@@ -1,0 +1,746 @@
+// Kleuren en variabelen
+$groen: #2a5934;
+$groen-donker: #1e4025;
+$achtergrond: #f9f9f7;
+$tekst: #333;
+$wit: #fff;
+
+// Basis reset
+/* Algemene reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  font-family: 'Helvetica Neue', Arial, sans-serif;
+  background-color: #f9f9f7;
+  color: #333;
+  line-height: 1.6;
+}
+
+main {
+  flex: 1;
+}
+
+.container {
+  width: 90%;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+/* Topbar */
+.topbar {
+  background-color: #f9f9f7;
+  border-bottom: 1px solid #ddd;
+  font-size: 0.9rem;
+  color: #333;
+  padding: 0.3rem 5%;
+}
+
+.topbar .contact-info {
+  text-align: right;
+}
+
+.topbar .contact-info a {
+  color: #2a5934;
+  text-decoration: none;
+  margin-left: 0.5rem;
+}
+
+.topbar .contact-info a:hover {
+  text-decoration: underline;
+}
+
+/* Header en navigatie */
+.site-header {
+  background-color: #fff;
+  border-bottom: 1px solid #ddd;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 5%;
+}
+
+.site-header .logo {
+  height: 75px;
+  display: block;
+}
+
+.menu-toggle {
+  display: none;
+  background: none;
+  border: none;
+  font-size: 2rem;
+  color: #2a5934;
+  cursor: pointer;
+}
+
+.site-nav {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.site-nav ul {
+  list-style: none;
+  display: flex;
+  gap: 1.5rem;
+  margin: 0;
+  padding: 0;
+  align-items: center;
+}
+
+.site-nav a {
+  text-decoration: none;
+  color: #333;
+  font-weight: 500;
+  transition: color 0.3s ease;
+}
+
+.site-nav a:hover {
+  color: #2a5934;
+}
+
+/* Login-knop */
+.btn-login {
+  background-color: #2a5934;
+  color: #fff !important;
+  padding: 0.8rem 1.8rem;
+  margin-left: 1.5rem;
+  border-radius: 30px;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border: 2px solid #2a5934;
+  transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+  background-color: #1e4025;
+  border-color: #1e4025;
+}
+
+/* Mobielmenu */
+@media (max-width: 768px) {
+  .menu-toggle {
+      display: block;
+      margin-left: auto;
+  }
+
+  .site-nav {
+      display: none;
+      flex-direction: column;
+      position: absolute;
+      top: 100%;
+      right: 0;
+      background: #fff;
+      border: 1px solid #ddd;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      z-index: 1000;
+  }
+
+  .site-nav.active {
+      display: flex;
+  }
+
+  .site-nav ul {
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
+      margin: 0;
+  }
+
+  .site-nav li {
+      text-align: right;
+  }
+
+  .btn-login {
+      margin: 0;
+  }
+}
+
+// Hero sectie
+.hero {
+    background: url('/img/serene-bg.jpg') no-repeat center center/cover;
+    height: 120vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding-top: 4rem;
+    color: $wit;
+    text-align: center;
+
+    .hero-content {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        max-width: 800px;
+    }
+
+    h1 {
+      font-size: 2.8rem;
+      margin-bottom: 1rem;
+    }
+  
+    p {
+      font-size: 1.2rem;
+      max-width: 600px;
+      margin: 0 auto 2rem;
+    }
+  
+    .btn {
+      background-color: $groen;
+      color: $wit;
+      padding: 1rem 2.5rem;  
+      border-radius: 30px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      margin-top: 1rem;
+      margin-bottom: 3rem;  // extra ruimte onder de knop
+  
+      &:hover {
+        background-color: $groen-donker;
+      }
+    }
+  }
+  
+
+// Knoppen
+.btn-login {
+    background-color: #2a5934;
+    color: #fff !important;
+    padding: 0.8rem 1.8rem; /* groter */
+    margin-left: 1.5rem; /* afstand van andere links */
+    border-radius: 30px; /* pill-shape */
+    text-decoration: none;
+    font-size: 1.1rem; /* grotere tekst */
+    font-weight: bold;
+    border: 2px solid #2a5934;
+    transition: all 0.3s ease;
+}
+
+.btn-login:hover {
+    background-color: #1e4025; /* donkerder bij hover */
+    border-color: #1e4025;
+}
+
+
+// Productoverzicht
+.products {
+  padding: 3rem 0;
+  background: $wit;
+
+  h2 {
+    text-align: center;
+    margin-bottom: 2rem;
+  }
+
+  .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+
+  .product-card {
+    background: $achtergrond;
+    border-radius: 10px;
+    padding: 1rem;
+    text-align: center;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+    transition: transform 0.3s ease;
+
+    img {
+      max-width: 100%;
+      border-radius: 8px;
+      margin-bottom: 1rem;
+    }
+
+    .products .product-card img {
+        max-width: 220px;
+        max-height: 120px;
+        object-fit: cover;
+        margin: 0 auto 1rem;
+        display: block;
+        border-radius: 8px;
+    }    
+
+    h3 {
+      margin-bottom: 0.5rem;
+    }
+
+    p {
+      font-size: 0.9rem;
+      margin-bottom: 1rem;
+    }
+
+    &:hover {
+      transform: translateY(-5px);
+    }
+  }
+}
+
+// Intro sectie
+.intro-section {
+    padding: 3rem 0;
+    background-color: $wit;
+  
+    .intro-content {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+    }
+  
+    .intro-box {
+      flex: 1 1 45%;
+      background: $achtergrond;
+      padding: 2rem;
+      border-radius: 10px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      text-align: center;
+  
+      h2 {
+        color: $groen;
+        margin-bottom: 1rem;
+      }
+    }
+  }
+  
+  // Stappen sectie
+  .steps-section {
+    background: $achtergrond;
+    padding: 3rem 0;
+    text-align: center;
+  
+    h2 { color: $groen; margin-bottom: 2rem; }
+  
+    .steps-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+    }
+  
+    .step-card {
+      background: $wit;
+      border-radius: 10px;
+      padding: 2rem;
+      width: 220px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  
+      h3 {
+        font-size: 2rem;
+        color: $groen;
+        margin-bottom: 1rem;
+      }
+    }
+  }
+  
+  // Uitgelichte producten (zelfde stijl als products)
+  .featured-products {
+    padding: 3rem 0;
+    background: $wit;
+  
+    h2 {
+      text-align: center;
+      margin-bottom: 2rem;
+    }
+  }
+  
+  // Reviews sectie
+  .reviews-section {
+    background: $achtergrond;
+    padding: 3rem 0;
+    text-align: center;
+  
+    h2 { color: $groen; margin-bottom: 2rem; }
+  
+    .reviews-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1.5rem;
+      justify-content: center;
+    }
+  
+    .review-card {
+      background: $wit;
+      border-radius: 10px;
+      padding: 1.5rem;
+      max-width: 300px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      font-style: italic;
+  
+      span {
+        display: block;
+        margin-top: 1rem;
+        font-weight: bold;
+        color: $groen-donker;
+      }
+    }
+  }
+  
+  // Contact sectie
+  .contact-section {
+    padding: 3rem 0;
+    background: $wit;
+    text-align: center;
+  
+   .container  h2 { color: $groen; margin-bottom: 2rem; }
+   .container  p {font-size: 0.9rem; margin-bottom: 1rem;}
+   .container .btn {
+        background-color: $groen;
+        color: $wit;
+        padding: 1rem 2.5rem;  
+        border-radius: 30px;
+        font-size: 1.2rem;
+        font-weight: bold;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        margin-top: 1rem;
+        margin-bottom: 3rem;  // extra ruimte onder de knop
+    
+        &:hover {
+          background-color: $groen-donker;
+        }
+      }
+  }
+
+ 
+
+  .contact-hero {
+    background: url('/img/serene-bg.jpg') no-repeat center center/cover;
+    padding: 5rem 0;
+    text-align: center;
+    color: $wit;
+  
+    h1 { font-size: 2.5rem; margin-bottom: 1rem; }
+    p { font-size: 1.2rem; max-width: 600px; margin: 0 auto; }
+  }
+  
+  /* Professionele contactpagina styling */
+.contact-content {
+    background: #f9f9f7;
+    padding: 4rem 0;
+}
+
+.contact-content .container {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 3rem;
+    justify-content: center;
+    align-items: flex-start;
+}
+
+/* Info box met icoontjes */
+.contact-content .contact-info-box {
+    flex: 1 1 400px;
+    background: #fff;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+    font-size: 1rem;
+    line-height: 1.8;
+}
+.contact-content .contact-info-box h2 {
+    margin-bottom: 1.5rem;
+    color: #2a5934;
+}
+.contact-content .contact-info-box p {
+    margin: 0.5rem 0;
+}
+.contact-content .contact-info-box a {
+    color: #2a5934;
+    text-decoration: none;
+    font-weight: bold;
+}
+.contact-content .contact-info-box a:hover {
+    text-decoration: underline;
+}
+
+/* Icons voor contactinfo */
+.contact-content .contact-info-box p::before {
+    content: '• ';
+    color: #2a5934;
+    font-weight: bold;
+}
+/* Formulier box */
+.contact-content .contact-form-box {
+    flex: 1 1 400px;
+   background:url('/img/brandekaars.jpg') no-repeat center center/cover;
+    padding: 2.5rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+}
+.contact-content .contact-form-box h2 {
+    margin-bottom: 1.5rem;
+    color: #2a5934;
+}
+
+/* Form fields */
+.contact-content form input,
+.contact-content form textarea {
+    width: 100%;
+    padding: 0.9rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    margin-bottom: 1.2rem;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+.contact-content form input:focus,
+.contact-content form textarea:focus {
+    border-color: #2a5934;
+    outline: none;
+}
+
+/* Verstuurknop */
+.contact-content form button {
+    background-color: #2a5934;
+    color: #fff;
+    padding: 0.9rem 2rem;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: bold;
+    transition: background-color 0.3s ease;
+}
+.contact-content form button:hover {
+    background-color: #1e4025;
+}
+
+// Loginpagina verbeterd
+.login-page {
+    background: url('/img/serene-bg.jpg') no-repeat center center/cover;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    padding: 3rem 1rem;
+    position: relative;
+  
+    &::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      background: rgba(0,0,0,0.25);
+      z-index: 0;
+    }
+  
+    .login-container {
+      position: relative;
+      z-index: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
+    }
+  
+    .login-card {
+      background: $wit;
+      padding: 2rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+      max-width: 380px;
+      width: 100%;
+      text-align: center;
+  
+      h1 {
+        color: $groen;
+        margin-bottom: 1rem;
+      }
+  
+      p {
+        margin-bottom: 1.5rem;
+        color: $tekst;
+        line-height: 1.6;
+      }
+  
+      form {
+        display: flex;
+        flex-direction: column;
+        gap: 1rem;
+  
+        label {
+          text-align: left;
+          font-weight: bold;
+        }
+  
+        input {
+          padding: 0.9rem;
+          border: 1px solid #ccc;
+          border-radius: 8px;
+          font-size: 1rem;
+          transition: border-color 0.3s ease;
+  
+          &:focus {
+            border-color: $groen;
+            outline: none;
+          }
+        }
+  
+        button {
+          background-color: $groen;
+          color: $wit;
+          padding: 0.9rem 2rem;
+          border-radius: 30px;
+          border: none;
+          cursor: pointer;
+          font-size: 1.1rem;
+          font-weight: bold;
+          transition: background-color 0.3s ease;
+          width: 100%;
+          margin-top: 0.5rem;
+  
+          &:hover {
+            background-color: $groen-donker;
+          }
+        }
+      }
+  
+      .login-note {
+        margin-top: 1rem;
+        font-size: 0.9rem;
+        color: #666;
+      }
+    }
+  }
+
+  .dashboard-page {
+    background: #f9f9f7;
+    padding: 3rem 0;
+  
+    .dashboard-welcome {
+      text-align: center;
+      margin-bottom: 2rem;
+  
+      h1 {
+        font-size: 2.2rem;
+        color: #2a5934;
+        margin-bottom: 1rem;
+      }
+  
+      p {
+        font-size: 1.1rem;
+        color: #555;
+      }
+    }
+  
+    .dashboard-actions {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+      gap: 2rem;
+  
+      .dashboard-card {
+        background: #fff;
+        border-radius: 10px;
+        padding: 2rem;
+        text-align: center;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        transition: transform 0.3s ease;
+  
+        h2 {
+          margin-bottom: 0.5rem;
+          color: #2a5934;
+        }
+  
+        p {
+          margin-bottom: 1.5rem;
+          color: #666;
+        }
+  
+        &:hover {
+          transform: translateY(-5px);
+        }
+      }
+    }
+  }
+  
+  .voorwaarden-hero {
+    position: relative;
+    background: url('/img/serene-bg.jpg') no-repeat center center/cover;
+    padding: 5rem 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    color: #fff;
+    text-align: center;
+  }
+  
+  .voorwaarden-hero .overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.4);
+    z-index: 0;
+  }
+  
+  .voorwaarden-container {
+    position: relative;
+    z-index: 1;
+    max-width: 900px;
+    width: 100%;
+  }
+  
+  .voorwaarden-container h1 {
+    font-size: 2.8rem;
+    margin-bottom: 0.5rem;
+    color: #fff;
+  }
+  
+  .voorwaarden-container .last-update {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+  }
+  
+  .voorwaarden-card {
+    background: #fff;
+    color: #333;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    text-align: left;
+  }
+  
+  .voorwaarden-card section {
+    margin-bottom: 2rem;
+  }
+  
+  .voorwaarden-card h2 {
+    color: #2a5934;
+    margin-bottom: 0.5rem;
+  }
+  
+  .voorwaarden-card p {
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+  
+// Footer
+.site-footer {
+  background-color: $groen;
+  color: $wit;
+  text-align: center;
+  padding: 1rem 0;
+  margin-top: 2rem;
+}
+

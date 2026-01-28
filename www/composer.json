@@ -1,0 +1,7 @@
+{
+    "require": {
+        "mvdnbrk/myparcel-php-api": "^2.3",
+        "mwspace/packlink-php": "dev-main",
+        "myparcelnl/sdk": "^9.0"
+    }
+}

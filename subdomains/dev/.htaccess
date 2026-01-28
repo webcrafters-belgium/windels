@@ -1,0 +1,68 @@
+# 404 -> publieke brug in webroot
+ErrorDocument 404 /error-404.php
+
+RewriteEngine On
+
+# Whitelist: jouw IP mag de site blijven zien (pas IP aan)
+RewriteCond %{REMOTE_ADDR} !^192\.168\.232\.170$
+
+# Laat maintenancepagina en assets door
+RewriteCond %{REQUEST_URI} !^/maintenance\.php$
+RewriteCond %{REQUEST_URI} !\.(css|js|png|jpg|jpeg|gif|svg|ico|webp|woff2?)$ [NC]
+
+# Activeer onderhoud wanneer vlagbestand bestaat
+RewriteCond %{DOCUMENT_ROOT}/.maintenance -f
+RewriteRule ^ /maintenance.php [L]
+########## (OPTIONEEL) COMING SOON ##########
+# Zet deze regel AAN om maintenance te activeren:
+# RewriteRule ^ - [E=MAINT:1]
+
+# Tijdens maintenance: enkel /comingsoon/ en assets toestaan
+#RewriteCond %{ENV:MAINT} =1
+#RewriteCond %{REQUEST_URI} !^/comingsoon/ [NC]
+#RewriteCond %{REQUEST_URI} !^/(assets|css|js|img|images|fonts)/ [NC]
+#RewriteRule ^ /comingsoon/index.php [L]
+#############################################
+
+
+
+# Bestaande bestanden/mappen passeren
+RewriteCond %{REQUEST_FILENAME} -f [OR]
+RewriteCond %{REQUEST_FILENAME} -d
+RewriteRule ^ - [L]
+
+# Voorkom loop naar de 404-bridge zelf
+RewriteRule ^error-404\.php$ - [L]
+
+# (OPTIONEEL) Front-controller (mooie URL's)
+# RewriteRule . index.php [L]
+
+# MJS als ES module
+AddType text/javascript .mjs
+
+# Lottie-bestanden
+AddType application/octet-stream .lottie
+AddType application/json .json
+
+# Cross-origin headers (niet strikt nodig als alles 'self' is)
+<FilesMatch "\.(mjs|lottie|json)$">
+  Header set X-Content-Type-Options "nosniff"
+</FilesMatch>
+
+
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  Header always set Content-Security-Policy "default-src 'self'; img-src 'self' https://medewerkers.windelsgreen-decoresin.com https://images-static.trustpilot.com https://*.trustpilot.com data:; script-src 'self' 'unsafe-inline' https://widget.trustpilot.com https://embed.trustpilot.com https://invitejs.trustpilot.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; frame-src 'self' https://widget.trustpilot.com https://*.trustpilot.com; child-src 'self' https://widget.trustpilot.com https://*.trustpilot.com; connect-src 'self' https://widget.trustpilot.com https://*.trustpilot.com; frame-ancestors 'self'; upgrade-insecure-requests"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Permissions-Policy "geolocation=(), microphone=(), camera=()"
+  Header always edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure;SameSite=Strict
+
+  Header set Access-Control-Allow-Origin "https://uitvaart.windelsgreen-decoresin.com"
+  Header set Access-Control-Allow-Methods "GET, POST, OPTIONS"
+  Header set Access-Control-Allow-Headers "Content-Type, Authorization"
+  Header set Vary "Origin"
+</IfModule>
+
+

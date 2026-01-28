@@ -1,0 +1,14 @@
+INCOMING (IMAP)
+Server: mail.webcrafters.be
+Port: 993
+Security: SSL/TLS
+Username: info@windelsgreen-decoresin.com
+Password: NtEEpi,98,}
+
+OUTGOING (SMTP)
+Server: mail.webcrafters.be
+Port: 587
+Security: STARTTLS
+Username: info@windelsgreen-decoresin.com
+Password: NtEEpi,98,}
+Authentication: REQUIRED

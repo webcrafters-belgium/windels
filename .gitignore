@@ -1,0 +1,56 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+Desktop.ini
+*.swp
+*.swo
+*.tmp
+*.bak
+
+# IDEs
+.idea/
+.vscode/
+
+# Node / frontend
+**/node_modules/
+**/.pnp.*
+**/.yarn/*
+**/dist/
+**/build/
+**/.next/
+**/.cache/
+**/.parcel-cache/
+
+# Env / secrets
+**/.env
+**/.env.*
+**/config/credentials.json
+
+# PHP / composer
+**/vendor/
+**/.phpunit.result.cache
+
+# Logs / runtime folders
+log/
+logs/
+tmp/
+www/logs/
+**/*.log
+
+# Subdomains: keep only the new React workspace tracked by default
+subdomains/*
+!subdomains/matthias/
+!subdomains/matthias/**
+
+# Large vendor trees we don't want in git
+www/phpmyadmin/
+www/lib/
+
+# Dev artifacts / exports (keep source code, ignore generated dumps/exports)
+www/localhost.sql
+www/dev/*.sql
+www/dev/**/sqldump.sql
+www/functions/dev/static_export/
+
+*.ini*
+ini.inc

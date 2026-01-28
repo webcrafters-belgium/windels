@@ -1,0 +1,14 @@
+{
+  "halloween": {
+    "title": "Halloween Banner",
+    "description": "Smalle banner voor de webshop Windels",
+    "prompt": "Halloween themed narrow website banner, dark background with pumpkins, bats, spider webs, and subtle glowing orange accents, modern e-commerce style, wide ratio",
+    "size": "1200x300"
+  },
+  "christmas": {
+    "title": "Christmas Banner",
+    "description": "Smalle kerstbanner voor de webshop Windels",
+    "prompt": "Christmas themed narrow website banner, snowflakes, Christmas trees, red and green accents, cozy but modern e-commerce style, wide ratio",
+    "size": "1200x300"
+  }
+}

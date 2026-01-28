@@ -1,0 +1,47 @@
+{
+  "company_name": "Windels Green & Deco Resin",
+  "owner": {
+    "name": "Andy Windels",
+    "bio": "Andy Windels is een gedreven ondernemer met een passie voor natuur en kunst. Hij richtte Windels Green & Deco Resin op in juli 2023.",
+    "contact": {
+      "email": "info@windelsgreen-decoresin.com",
+      "phone": "+32 11 75 33 19",
+      "address": "Beukenlaan 8, 3930 Hamont-Achel, België"
+    }
+  },
+  "opening_hours": {
+    "monday": "19:00 - 21:00",
+    "tuesday": "19:00 - 21:00",
+    "wednesday": "19:00 - 21:00",
+    "thursday": "10:00 - 18:00",
+    "friday": "10:00 - 18:00",
+    "saturday": "10:00 - 18:00",
+    "special": {
+      "2025-02-14": "10:00 - 16:00"
+    }
+  },
+  "products": [
+    {
+      "name": "Epoxyhars decoraties",
+      "url": "https://windelsgreen-decoresin.com/pages/shop/category.php?categories=epoxy"
+    },
+    {
+      "name": "Geurkaarsen",
+      "url": "https://windelsgreen-decoresin.com/pages/shop/category.php?categories=kaarsen"
+    },
+    {
+      "name": "Terrazzo producten",
+      "url": "https://windelsgreen-decoresin.com/pages/shop/category.php?categories=terrazzo"
+    },
+    {
+      "name": "Vers fruit",
+      "url": ""
+    },
+    {
+      "name": "Partijhandel (kledij, schoenen, speelgoed, huishoudelijke artikelen)",
+      "url": ""
+    }
+  ],
+  "mission": "Windels Green & Deco Resin brengt kunst en natuur samen in handgemaakte decoraties.",
+  "location": "Hamont-Achel, België"
+}

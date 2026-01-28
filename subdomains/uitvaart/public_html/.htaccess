@@ -1,0 +1,23 @@
+RewriteEngine On
+
+# Stap 1: Tijdsvoorwaarde: tot 30-08-2025 10:00
+RewriteCond %{TIME_YEAR}%{TIME_MON}%{TIME_DAY}%{TIME_HOUR}%{TIME_MIN} <202508301000
+
+# Stap 2: Sta ALLEEN toegang toe tot bestanden binnen /comingsoon/
+# RewriteCond %{REQUEST_URI} !^/comingsoon/.*
+
+# Stap 3: Alles buiten comingsoon => omleiden naar comingsoon/index.html
+# RewriteRule ^.*$ /comingsoon/index.php [L]
+
+<IfModule mod_headers.c>
+  Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
+  Header always set Content-Security-Policy "default-src 'self'; img-src 'self' https://medewerkers.windelsgreen-decoresin.com data:; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com; frame-ancestors 'none';"
+  Header always set X-Frame-Options "SAMEORIGIN"
+  Header set X-Content-Type-Options "nosniff"
+  Header set Referrer-Policy "strict-origin-when-cross-origin"
+  Header set Permissions-Policy "geolocation=(), microphone=(), camera=()" 
+  Header always edit Set-Cookie ^(.*)$ $1;HttpOnly;Secure;SameSite=Strict
+  Header set Access-Control-Allow-Origin "https://dev.windelsgreen-decoresin.com"
+</IfModule>
+
+  
