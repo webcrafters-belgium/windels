@@ -52,5 +52,7 @@ www/dev/*.sql
 www/dev/**/sqldump.sql
 www/functions/dev/static_export/
 
+*/images
+
 *.ini*
 ini.inc
