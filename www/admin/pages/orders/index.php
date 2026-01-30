@@ -109,7 +109,7 @@ $result = $stmt->get_result();
             <button type="submit" class="accent-bg text-white px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition flex items-center gap-2">
                 <i class="bi bi-search"></i>Filteren
             </button>
-            <a href="/pages/orders/index.php" class="glass px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition flex items-center gap-2">
+            <a href="/admin/pages/orders/" class="glass px-6 py-3 rounded-xl font-semibold hover:opacity-90 transition flex items-center gap-2">
                 <i class="bi bi-x-circle"></i>Reset
             </a>
         </div>

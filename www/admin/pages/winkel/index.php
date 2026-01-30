@@ -30,12 +30,12 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 <!-- WINKEL MENU CARDS -->
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 stagger-children">
     
-    <a href="/index.php" class="card-glass p-6 group">
+    <a href="/admin/" class="card-glass p-6 group">
         <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-teal-500/30 to-cyan-500/30 flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <i class="bi bi-house-fill text-2xl text-teal-400"></i>
         </div>
-        <h3 class="text-xl font-semibold mb-1">Home</h3>
-        <p class="text-sm" style="color: var(--text-muted);">Ga naar de hoofdpagina</p>
+        <h3 class="text-xl font-semibold mb-1">Admin Home</h3>
+        <p class="text-sm" style="color: var(--text-muted);">Terug naar dashboard</p>
     </a>
     
     <a href="/images/products/product_img_folder.php" class="card-glass p-6 group">
