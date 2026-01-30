@@ -1,7 +1,5 @@
 <?php
-
-require $_SERVER["DOCUMENT_ROOT"] . '/ini.inc';
-require $_SERVER["DOCUMENT_ROOT"] . '/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
@@ -55,4 +53,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </form>
 </div>
 
-<?php require $_SERVER["DOCUMENT_ROOT"] . '/footer.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>

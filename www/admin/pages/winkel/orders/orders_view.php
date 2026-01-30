@@ -5,8 +5,7 @@ session_start();
 $admin_role = 'admin';
 $_SESSION['admin_role'] = $admin_role;
 
-require $_SERVER["DOCUMENT_ROOT"] . '/ini.inc';
-require $_SERVER["DOCUMENT_ROOT"] . '/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 
 // Haal bestellingen op per status
 $conceptOrders = [];
@@ -160,4 +159,4 @@ if ($stmt = $conn->prepare("SELECT * FROM orders WHERE status = 'Afgehandeld'"))
     </div>
 </div>
 
-<?php require $_SERVER["DOCUMENT_ROOT"] . '/footer.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>
