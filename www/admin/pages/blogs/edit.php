@@ -1,7 +1,6 @@
 <?php
-// FILE: /admin/pages/blog/edit.php
 require $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
-session_start();
+if (session_status() === PHP_SESSION_NONE) session_start();
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     exit('Ongeldig blog-ID');
@@ -9,7 +8,6 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 
 $id = (int)$_GET['id'];
 
-/* ===== HUIDIGE BLOG OPHALEN ===== */
 $stmt = $conn->prepare("SELECT * FROM blog_posts WHERE id = ?");
 $stmt->bind_param("i", $id);
 $stmt->execute();
@@ -20,87 +18,99 @@ if (!$blog) {
     exit('Blog niet gevonden');
 }
 
-/* ===== OPSLAAN ===== */
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title   = $_POST['title'] ?? '';
     $content = $_POST['content'] ?? '';
     $author  = $_POST['author'] ?? $blog['author'];
-    $imagePath = null;
+    $imagePath = $blog['image'];
 
-    if (
-        isset($_FILES['image']) &&
-        $_FILES['image']['error'] === UPLOAD_ERR_OK
-    ) {
+    if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
         $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/images/uploads/blog/';
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0755, true);
-        }
+        if (!is_dir($uploadDir)) mkdir($uploadDir, 0755, true);
 
         $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
         $allowed = ['jpg', 'jpeg', 'png', 'webp'];
 
-        if (!in_array($ext, $allowed, true)) {
-            exit('Ongeldig afbeeldingstype');
-        }
+        if (!in_array($ext, $allowed, true)) exit('Ongeldig afbeeldingstype');
 
         $imageName = uniqid('blog_', true) . '.' . $ext;
         $target = $uploadDir . $imageName;
 
-        if (!move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
-            exit('move_uploaded_file faalde');
+        if (move_uploaded_file($_FILES['image']['tmp_name'], $target)) {
+            $imagePath = '/images/uploads/blog/' . $imageName;
         }
-
-        // DIT is wat in de DB moet
-        $imagePath = '/images/uploads/blog/' . $imageName;
     }
 
-    $update = $conn->prepare("
-        UPDATE blog_posts
-        SET title = ?, content = ?, image = ?, author = ?
-        WHERE id = ?
-    ");
+    $update = $conn->prepare("UPDATE blog_posts SET title = ?, content = ?, image = ?, author = ? WHERE id = ?");
     $update->bind_param("ssssi", $title, $content, $imagePath, $author, $id);
     $update->execute();
 
     header("Location: /admin/pages/blogs/index.php?updated=1");
     exit;
 }
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 ?>
 
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/admin/header.php'; ?>
-
-<div class="p-8 text-gray-200 max-w-3xl">
-    <h1 class="text-2xl font-bold mb-6">Blog bewerken</h1>
-
-    <form method="post" enctype="multipart/form-data" class="space-y-4">
+<!-- PAGE HEADER -->
+<div class="mb-8">
+    <div class="flex items-center justify-between">
         <div>
-            <label>Titel</label>
-            <input type="text" name="title" value="<?= htmlspecialchars($blog['title']) ?>" required>
+            <h1 class="text-4xl font-bold mb-2 glow-text" style="color: var(--text-primary);">
+                <i class="bi bi-pencil-square accent-primary mr-3"></i>Blog bewerken
+            </h1>
+            <p class="text-lg" style="color: var(--text-muted);">Bewerk de blogpost</p>
+        </div>
+        <a href="/admin/pages/blogs/index.php" class="glass px-5 py-3 rounded-xl font-semibold hover:bg-white/10 transition flex items-center gap-2" style="color: var(--text-secondary);">
+            <i class="bi bi-arrow-left"></i>Terug
+        </a>
+    </div>
+</div>
+
+<!-- FORM -->
+<div class="card-glass p-8">
+    <form method="post" enctype="multipart/form-data" class="space-y-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex flex-col">
+                <label class="text-sm font-semibold mb-2" style="color: var(--text-secondary);">Titel</label>
+                <input type="text" name="title" value="<?= htmlspecialchars($blog['title']) ?>" required
+                       class="w-full px-4 py-3 rounded-xl glass border" style="border-color: var(--border-glass);">
+            </div>
+
+            <div class="flex flex-col">
+                <label class="text-sm font-semibold mb-2" style="color: var(--text-secondary);">Auteur</label>
+                <input type="text" name="author" value="<?= htmlspecialchars($blog['author']) ?>" readonly
+                       class="w-full px-4 py-3 rounded-xl glass border opacity-60" style="border-color: var(--border-glass);">
+            </div>
         </div>
 
-        <div>
-            <label>Auteur</label>
-            <input type="text" name="author" value="<?= htmlspecialchars($blog['author']) ?>" readonly>
-        </div>
-
-        <div>
-            <label>Inhoud</label>
-            <textarea name="content" id="content" rows="10"><?= htmlspecialchars($blog['content']) ?></textarea>
+        <div class="flex flex-col">
+            <label class="text-sm font-semibold mb-2" style="color: var(--text-secondary);">Inhoud</label>
+            <textarea name="content" id="content" rows="12"
+                      class="w-full px-4 py-3 rounded-xl glass border" style="border-color: var(--border-glass);"><?= htmlspecialchars($blog['content']) ?></textarea>
         </div>
 
         <?php if (!empty($blog['image'])): ?>
-            <div>
-                <label>Huidige afbeelding</label><br>
-                <img src="<?= $blog['image'] ?>" style="max-width:300px;border-radius:8px">
-            </div>
+        <div class="flex flex-col">
+            <label class="text-sm font-semibold mb-2" style="color: var(--text-secondary);">Huidige afbeelding</label>
+            <img src="<?= $blog['image'] ?>" class="rounded-xl max-w-xs border" style="border-color: var(--border-glass);">
+        </div>
         <?php endif; ?>
 
-        <div>
-            <label>Nieuwe afbeelding (optioneel)</label>
-            <input type="file" name="image">
+        <div class="flex flex-col">
+            <label class="text-sm font-semibold mb-2" style="color: var(--text-secondary);">Nieuwe afbeelding (optioneel)</label>
+            <input type="file" name="image" accept="image/*"
+                   class="w-full px-4 py-3 rounded-xl glass border" style="border-color: var(--border-glass);">
         </div>
 
-        <button type="submit" class="btn btn-primary">Opslaan</button>
+        <div class="flex items-center gap-4 pt-4">
+            <button type="submit" class="accent-bg text-white px-8 py-3 rounded-xl font-semibold hover:opacity-90 transition flex items-center gap-2">
+                <i class="bi bi-check-lg"></i>Opslaan
+            </button>
+            <a href="/admin/pages/blogs/index.php" class="glass px-6 py-3 rounded-xl font-semibold hover:bg-white/10 transition">
+                Annuleren
+            </a>
+        </div>
     </form>
 </div>
 
@@ -113,6 +123,10 @@ tinymce.init({
     toolbar: 'undo redo | styles | bold italic underline | alignleft aligncenter alignright | bullist numlist | link image | code',
     height: 400,
     language: 'nl',
-    entity_encoding: 'raw'
+    entity_encoding: 'raw',
+    skin: 'oxide-dark',
+    content_css: 'dark'
 });
 </script>
+
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>

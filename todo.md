@@ -46,4 +46,8 @@
 - Added inferred route -> API contract mapping in `AGENTS.md` (completed 2026-01-28).
 - Drafted React route/component tree in `AGENTS.md` (completed 2026-01-28).
 - Port About page to React (routes/AboutPage.tsx) and Tailwind.
+- Build full-site shell in React matching legacy header/footer (Header, Footer, RootLayout, Snowflakes) and wire routing.
+- Flesh out `/shop` page layout with static placeholders mirroring legacy grid; then connect to live product API.
+- Connect cart, checkout, account pages to backend API once product feed is live.
+- Hook admin React pages to live DB-backed API for products/orders/customers/promos CRUD and verification.
  

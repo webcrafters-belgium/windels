@@ -1,11 +1,7 @@
 <!-- SIDEBAR -->
-<aside class="hidden md:block w-64 bg-[#141414] border-r border-gray-800 min-h-screen p-6">
-    <h2 class="text-sm uppercase tracking-wider text-gray-500">Navigatie</h2>
-    <ul class="mt-4 space-y-2">
-        <li><a href="/admin/pages/products" class="block p-2 rounded hover:bg-gray-800"><i class="bi bi-box-seam mr-2"></i> Producten</a></li>
-        <li><a href="/admin/orders" class="block p-2 rounded hover:bg-gray-800"><i class="bi bi-receipt mr-2"></i> Bestellingen</a></li>
-        <li><a href="/admin/customers" class="block p-2 rounded hover:bg-gray-800"><i class="bi bi-people mr-2"></i> Klanten</a></li>
-        <li><a href="/admin/settings" class="block p-2 rounded hover:bg-gray-800"><i class="bi bi-gear mr-2"></i> Instellingen</a></li>
-        <li><a href="/admin/" class="block p-2 rounded hover:bg-gray-800"><i class="bi bi-house mr-2"></i>Home</a></li>
+<aside class="hidden md:block w-64 glass rounded-2xl p-6 h-fit sticky top-24">
+    <h2 class="text-xs uppercase tracking-widest text-teal-400 font-semibold mb-4">Navigatie</h2>
+    <ul class="space-y-2">
+        <li><a href="/admin/" class="flex items-center space-x-3 p-3 rounded-xl hover:bg-white/5 transition"><i class="bi bi-house-fill text-xl text-amber-400"></i><span>Home</span></a></li>
     </ul>
 </aside>
