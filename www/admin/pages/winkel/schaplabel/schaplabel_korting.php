@@ -180,7 +180,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['labels'])) {
     exit;
 }
 
-require $_SERVER['DOCUMENT_ROOT'] . '/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 ?>
 
 
@@ -361,4 +361,4 @@ require $_SERVER['DOCUMENT_ROOT'] . '/header.php';
 
 </div>
 
-<?php require $_SERVER['DOCUMENT_ROOT'] . '/footer.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>

@@ -1,7 +1,7 @@
 <?php
   // Controleer of de gebruiker is ingelogd
-require $_SERVER["DOCUMENT_ROOT"] . '/ini.inc';  // Verbind met de database
-require $_SERVER["DOCUMENT_ROOT"] . '/header.php';  // Laad de header in
+  // Verbind met de database
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';  // Laad de header in
 
 // Controleren of het formulier is ingediend
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
@@ -51,4 +51,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     </form>
 </div>
 
-<?php require $_SERVER["DOCUMENT_ROOT"] . '/footer.php';  // Laad de footer in ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php';  // Laad de footer in ?>

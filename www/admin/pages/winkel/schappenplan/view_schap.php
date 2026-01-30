@@ -1,6 +1,6 @@
 <?php
 
-require $_SERVER["DOCUMENT_ROOT"] . '/ini.inc';
+
 
 $id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 
@@ -40,7 +40,7 @@ function fetchProductDetails($pdo_winkel, $product_id, $product_type) {
 
 $producten = fetchProductsForSchap($pdo_winkel, $id);
 
-require $_SERVER["DOCUMENT_ROOT"] . '/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 ?>
 
 <head>
@@ -345,4 +345,4 @@ function verwijderProduct(productId) {
 
 </script>
 
-<?php require $_SERVER["DOCUMENT_ROOT"] . '/footer.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>

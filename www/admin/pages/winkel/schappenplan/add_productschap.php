@@ -1,6 +1,6 @@
 <?php
 
-require $_SERVER["DOCUMENT_ROOT"] . '/ini.inc'; // Verbind met de database
+ // Verbind met de database
 
 // Haal alle schappen op
 function fetchSchappen($pdo_winkel) {
@@ -72,7 +72,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 // Haal beschikbare schappen op
 $schappen = fetchSchappen($pdo_winkel);
 
-require $_SERVER["DOCUMENT_ROOT"] . '/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 ?>
 
 <div class="container mt-5">
@@ -111,4 +111,4 @@ require $_SERVER["DOCUMENT_ROOT"] . '/header.php';
     </form>
 </div>
 
-<?php require $_SERVER["DOCUMENT_ROOT"] . '/footer.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>

@@ -1,7 +1,7 @@
 <?php
 
-require $_SERVER["DOCUMENT_ROOT"] . '/ini.inc';
-require $_SERVER["DOCUMENT_ROOT"] . '/header.php';
+
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 
 $schap_id = isset($_GET['schap_id']) ? (int)$_GET['schap_id'] : 0;
 
