@@ -74,9 +74,9 @@ if ($stmt = $conn->prepare("SELECT * FROM orders WHERE status = 'Afgehandeld'"))
                             <td><?= htmlspecialchars($order['order_code']) ?></td>
                             <td><?= htmlspecialchars($order['created_at']) ?></td>
                             <td>
-                                <a href="/andy/winkel/view_order.php?order_id=<?= $order['id'] ?>" class="btn btn-info btn-sm">Bekijk Order</a>
-                                <a href="/andy/winkel/edit_order.php?id=<?= $order['id'] ?>" class="btn btn-warning btn-sm">Bewerk</a>
-                                <a href="/andy/winkel/send_to_warehouse.php?id=<?= $order['id'] ?>" class="btn btn-success btn-sm">Verzend naar Magazijn</a>
+                                <a href="/admin/pages/winkel/orders/view_order.php?order_id=<?= $order['id'] ?>" class="btn btn-info btn-sm">Bekijk Order</a>
+                                <a href="/admin/pages/winkel/orders/edit_order.php?id=<?= $order['id'] ?>" class="btn btn-warning btn-sm">Bewerk</a>
+                                <a href="/admin/pages/winkel/orders/send_to_warehouse.php?id=<?= $order['id'] ?>" class="btn btn-success btn-sm">Verzend naar Magazijn</a>
                             </td>
                         </tr>
                     <?php endforeach; ?>
