@@ -1,17 +1,5 @@
 <?php
-require $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
-session_start();
-
-if (!isset($_SESSION['user']['role']) || $_SESSION['user']['role'] !== 'admin') {
-    header("Location: /pages/account/login?referer=/admin/");
-    exit;
-}
-
-$username = $_SESSION['user']['name'] ?? 'admin';
-$currentUserId = $_SESSION['user']['id'] ?? 0;
-$currentRole = $_SESSION['user']['role'] ?? 'user';
-
-include $_SERVER['DOCUMENT_ROOT'] . '/admin/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 
 $todoFile = $_SERVER['DOCUMENT_ROOT'] . '/todo.php';
 $todos = file_exists($todoFile) ? require $todoFile : ['short_term' => [], 'long_term' => []];
@@ -19,6 +7,9 @@ $todos = file_exists($todoFile) ? require $todoFile : ['short_term' => [], 'long
 $sql = "SELECT * FROM admin_pages WHERE visibility = 'visible' ORDER BY display_order ASC";
 $result = $conn->query($sql);
 $pages_by_section = [];
+
+$currentUserId = $_SESSION['user']['id'] ?? 0;
+$currentRole = $_SESSION['user']['role'] ?? 'user';
 
 while ($page = $result->fetch_assoc()) {
     $belongsToUser = (int)$page['user_id'] === $currentUserId;
@@ -229,4 +220,4 @@ while ($page = $result->fetch_assoc()) {
     });
 </script>
 
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/admin/footer.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>
