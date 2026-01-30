@@ -1,6 +1,5 @@
 <?php
-include($_SERVER['DOCUMENT_ROOT'] . '/ini.inc');
-include($_SERVER['DOCUMENT_ROOT'] . '/header.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 
 $nu = new DateTime('now', new DateTimeZone('Europe/Brussels'));
 $open = new DateTime('19:00', new DateTimeZone('Europe/Brussels'));
@@ -189,4 +188,4 @@ $categories = $conn->query("SELECT id, name FROM categories ORDER BY name ASC");
         </nav>
     </div>
 
-<?php include($_SERVER['DOCUMENT_ROOT'] . '/footer.php'); ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>

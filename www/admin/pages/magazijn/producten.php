@@ -1,5 +1,5 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'] . '/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 ?>
 
 <div class="container mt-5">
@@ -503,5 +503,5 @@ include $_SERVER['DOCUMENT_ROOT'] . '/header.php';
     </div>
 
     <?php
-
-include $_SERVER['DOCUMENT_ROOT'] . '/footer.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php';
+?>
