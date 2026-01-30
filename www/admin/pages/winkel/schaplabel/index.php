@@ -1,7 +1,6 @@
 <?php
 session_start();
-
-require $_SERVER["DOCUMENT_ROOT"] . '/ini.inc';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 
 // Controleer of de gebruiker is ingelogd en rol heeft
 if (!isset($_SESSION['role'])) {
@@ -30,9 +29,6 @@ $stmt->execute([$admin_role, $current_date, $category]);
 
 $result = $stmt->get_result();
 $buttons = $result->fetch_all(MYSQLI_ASSOC);
-
-
-require $_SERVER["DOCUMENT_ROOT"] . '/header.php';
 ?>
 
 <div class="container mt-5">
@@ -67,4 +63,4 @@ require $_SERVER["DOCUMENT_ROOT"] . '/header.php';
 </div>
 
 <?php
-require $_SERVER["DOCUMENT_ROOT"] . '/footer.php'; ?>
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>

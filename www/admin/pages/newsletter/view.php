@@ -1,11 +1,9 @@
 <?php
-
-require $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
-require $_SERVER['DOCUMENT_ROOT'] . '/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     echo "<div class='container py-5'><h3>❌ Geen geldig ID opgegeven.</h3></div>";
-    require $_SERVER['DOCUMENT_ROOT'] . '/footer.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php';
     exit;
 }
 
@@ -20,7 +18,7 @@ $stmt->close();
 
 if (!$newsletter) {
     echo "<div class='container py-5'><h3>❌ Nieuwsbrief niet gevonden.</h3></div>";
-    require $_SERVER['DOCUMENT_ROOT'] . '/footer.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php';
     exit;
 }
 ?>
@@ -45,4 +43,4 @@ if (!$newsletter) {
     <a href="/admin/pages/newsletter/" class="btn btn-secondary mt-4">← Terug naar overzicht</a>
 </div>
 
-<?php require $_SERVER['DOCUMENT_ROOT'] . '/footer.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>

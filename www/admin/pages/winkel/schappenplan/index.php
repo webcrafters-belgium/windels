@@ -1,6 +1,5 @@
 <?php
-
-require $_SERVER["DOCUMENT_ROOT"] . '/ini.inc';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 
 // Haal alle schappen op
 function fetchSchappen($pdo_winkel) {
@@ -9,8 +8,6 @@ function fetchSchappen($pdo_winkel) {
 }
 
 $schappen = fetchSchappen($pdo_winkel);
-
-require $_SERVER["DOCUMENT_ROOT"] . '/header.php';
 ?>
 
 <div class="container mt-5">
@@ -77,4 +74,4 @@ $(document).ready(function() {
 });
 </script>
 
-<?php require $_SERVER["DOCUMENT_ROOT"] . '/footer.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>
