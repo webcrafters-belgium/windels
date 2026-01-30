@@ -1,6 +1,5 @@
 <?php
-include($_SERVER['DOCUMENT_ROOT'] . '/ini.inc');
-include($_SERVER['DOCUMENT_ROOT'] . '/admin/header.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 
 /* Volgende SKU bepalen */
 $getSku = "SELECT MAX(CAST(SUBSTRING_INDEX(sku, '-', -1) AS UNSIGNED)) AS sku FROM products";
@@ -314,4 +313,4 @@ if ($res && $row = $res->fetch_assoc()) {
     });
 </script>
 
-<?php include($_SERVER['DOCUMENT_ROOT'] . '/admin/footer.php'); ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>
