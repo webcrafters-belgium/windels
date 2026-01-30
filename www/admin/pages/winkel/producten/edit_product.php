@@ -1,15 +1,13 @@
 <?php
-
 error_reporting(E_ALL ^ (E_NOTICE ^ E_WARNING));
 ini_set('display_errors', 1);
 
-include($_SERVER['DOCUMENT_ROOT'] . '/ini.inc');
-include($_SERVER['DOCUMENT_ROOT'] . '/header.php');
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 
 $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
 if (!$product_id) {
     echo "<div class='alert alert-danger'>Geen geldig product geselecteerd.</div>";
-    include($_SERVER['DOCUMENT_ROOT'] . '/footer.php');
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php';
     exit;
 }
 
@@ -23,7 +21,7 @@ $sku = $product['sku'];
 
 if (!$product) {
     echo "<div class='alert alert-danger'>Product niet gevonden.</div>";
-    include($_SERVER['DOCUMENT_ROOT'] . '/footer.php');
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php';
     exit;
 }
 
@@ -150,4 +148,4 @@ $subcategories = $conn->query("SELECT id, name, parent_id FROM subcategories ORD
     </form>
 </div>
 
-<?php include($_SERVER['DOCUMENT_ROOT'] . '/footer.php'); ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>

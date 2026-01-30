@@ -1,10 +1,9 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
-include $_SERVER['DOCUMENT_ROOT'] . '/header.php';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
     echo "<p>❌ Ongeldig klant-ID.</p>";
-    include $_SERVER['DOCUMENT_ROOT'] . '/footer.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php';
     exit;
 }
 
@@ -16,7 +15,7 @@ $result = $stmt->get_result();
 
 if ($result->num_rows === 0) {
     echo "<p>❌ Klant niet gevonden.</p>";
-    include $_SERVER['DOCUMENT_ROOT'] . '/footer.php';
+    require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php';
     exit;
 }
 
@@ -111,4 +110,4 @@ $orders = $order_stmt->get_result();
 
 </div>
 
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/footer.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>

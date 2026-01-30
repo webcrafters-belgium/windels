@@ -1,6 +1,5 @@
 <?php
-include $_SERVER['DOCUMENT_ROOT'] . '/header.php';
-include $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/header.php';
 ?>
 
 <div class="admin-promo">
@@ -71,4 +70,4 @@ include $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
     });
 </script>
 
-<?php include $_SERVER['DOCUMENT_ROOT'] . '/footer.php'; ?>
+<?php require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/includes/footer.php'; ?>
