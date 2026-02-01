@@ -231,6 +231,7 @@ $count = $count ?? 0;
         pointer-events: none;
         font-size: 1em;
         animation: fall linear infinite;
+        display: none;
     }
 
     @keyframes fall {

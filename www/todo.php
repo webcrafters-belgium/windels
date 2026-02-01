@@ -133,6 +133,16 @@ return [
 
         'Admin' => [
             [
+                'title' => 'Canonieke admin bepalen (admin/pages vs admin/admin) en alle links consistent maken.',
+                'status' => 'open',
+                'links' => ['/admin/', '/admin/pages/dashboard/index.php'],
+            ],
+            [
+                'title' => 'Admin include/config padconsistentie controleren (ini.inc, config.php).',
+                'status' => 'open',
+                'links' => ['/admin/includes/header.php', '/admin/config.php', '/ini.inc'],
+            ],
+            [
                 'title' => 'Bijwerken: /admin/voedselproblemen/index.php',
                 'status' => 'open',
                 'links' => ['/admin/voedselproblemen/index.php'],
@@ -198,6 +208,14 @@ return [
         ],
 
         'Logging & Beheer' => [
+            [
+                'title' => 'Secrets uit repo halen (ini.inc/.env), voorbeelden maken zonder secrets.',
+                'status' => 'open',
+            ],
+            [
+                'title' => 'Dev/test routes afschermen (dev/, pages/dev/, pages/test/, API/dev/).',
+                'status' => 'open',
+            ],
             [
                 'title' => 'Automatisch changelog systeem bouwen → wijzigingen loggen naar changelog.txt.',
                 'status' => 'done',

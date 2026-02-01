@@ -1,402 +1,51 @@
-# AGENT ROADMAP
+# AGENTS — Windels (Final PHP Site)
 
-## Non-negotiable
-- Use a maximum of 50K tokens/minute, split tasks in manageable pieces. 
-- Dont use herestrings to put data to a file
+## Direction (non-negotiable)
+- PHP-only. No React, no Tailwind, no npm.
+- Production-first: /www must keep working at all times.
+- No feature removals; only fixes, refactors, or restorations.
+- No secrets in git. Use ini.inc or environment and keep .env out of commits.
 
+## Repo layout (current)
+- `www/` — production PHP site (storefront + admin + API + functions).
+- `backup/`, `tmp/` — local-only working copies, not production.
+- `subdomains/` — local staging/legacy; not used for production.
+- Root `todo.md` / `done.md` — project plan and verified completions.
 
-## Context
-- The workspace root is `C:\Users\matth\Desktop\DEV\websites\Windels` ("root"). Treat everything here as part of the project scope; `dist/` is the legacy PHP site, and `subdomains/matthias/dist` is the new React+Tailwind playground.
-- Remote access/credentials must never be committed. If DB or SSH access is needed, paste only the minimum schema/data required into the chat (no secrets).
-- Ignore heavy vendor trees (`node_modules`, `bin`, `lib`, `vendor`, etc.) unless specifically required.
+## Key entrypoints
+- Public site: `www/index.php`, `www/header.php`, `www/footer.php`
+- Routing: `www/.htaccess` (slug routing + error docs)
+- Config: `www/ini.inc` (DB + runtime config), `www/.env` (local only)
+- Admin entry: `www/admin/index.php` -> dashboard
+- Admin dashboard: `www/admin/pages/dashboard/index.php`
+- Admin include shell: `www/admin/includes/header.php`, `www/admin/includes/footer.php`
+- Admin config: `www/admin/config.php` (wraps ini.inc and graceful DB fallback)
+- API: `www/API/**`
+- Business logic: `www/functions/**`
+- Emails: `www/templates/**`
 
-## Workflow rules
-1. Always record intent and status in `todo.md`/`done.md` at the repo root, never inside `dist/`. Use `AGENTS.md` to describe how tasks touch each folder.
-2. For each folder we tackle (e.g., `admin/`, `API/`, `css/`, `pages/`, `subdomains/matthias/dist`), document purpose, dependencies, and styling notes before refactoring. Use React components + Tailwind utilities when rebuilding view logic, but keep necessary PHP/Laravel endpoints to serve data until replacements exist.
-3. Capture data/API contracts per folder: which tables, config files, or services are consumed. If an area requires DB info, request a schema snippet and note where it will be stored (e.g., `.env`, `config/`).
-4. Every root-level change must keep the legacy `dist/` runnable until its replacement is deployed. When a folder is ported into React/Tailwind inside `subdomains/matthias/dist`, note sufficient compatibility in `todo.md`/`done.md`.
-5. Maintain a living checklist per folder inside `todo.md` (subtasks, statuses). Once a folder is fully ported and verified, move the entry to `done.md` with a brief summary of what was completed.
-6. Use the new subdomain path for building/testing: `subdomains/matthias/dist` becomes the React/Tailwind workspace; plan deployments, asset sync, and routing with that path in mind.
-7. Keep communication concise: mention the stack (React+Tailwind) and the need to respect existing backend services. Any blocked steps should note the missing info (e.g., API schema) so we can follow up.
+## Admin structure
+- Current admin UI is under `www/admin/pages/**`.
+- There is also a legacy/duplicate tree under `www/admin/admin/**`.
+- Do not remove anything until paths are mapped and verified.
 
-## www inventory and React migration plan (2026-01-28)
-This section maps the legacy `www/` tree and defines how each area should move into React+Tailwind while preserving PHP backends.
+## Rules for changes
+- Always identify the exact file + error before changing anything.
+- Minimal patches only; never drop functionality.
+- After each logical change: verify the relevant URL and note evidence.
+- Do not use npm or any frontend build tooling.
 
-### Root-level files
-- `www/index.php`, `www/header.php`, `www/footer.php`: primary storefront entry and shared layout; convert to React layout, keep PHP includes for legacy until React routes replace each page.
-- `www/ini.inc`, `www/config/credentials.json`: runtime config and external credentials; document required keys in `.env` for React API proxy when needed.
-- `www/composer.json`, `www/composer.lock`: PHP deps for backend utilities; keep for server-side mail, shipping, and order tooling.
-- `www/site.webmanifest`, `www/robots.txt`, `www/request.json`, `www/readme.md`, `www/summary.md`, `www/categories.md`, `www/CHANGELOG.md`: metadata and notes; use to mirror SEO and category structure in React routes.
+## Verification checklist (per change)
+1) Admin URL opens (200) and renders without fatal errors.
+2) Affected admin page loads and actions do not fatally error.
+3) Public pages still load (home + one product page).
 
-### Pages (public routes -> React routes)
-- `www/pages/`: public page routes; port to React routes under `subdomains/matthias/dist`.
-  - Account: `account/` (login, register, accountgegevens, bestellingen, forgot_password, deletion, logout).
-  - Shop: `shop/` (index, category, search, cart, shopping-cart, products/product, promo, deal-van-de-week, orders-tracking, terrazzo, vers, cadeaus).
-  - Content: `about/`, `over-ons/`, `blogs/`, `contact/`, `privacybeleid/`, `terms_of_service/`, `cookies/`, `uitvaart/`, `workshops/`.
-  - Dev/test: `pages/test/`, `pages/dev/` (retain only as backend diagnostics).
+## Current known risks
+- Secrets are stored in `www/ini.inc` and `www/.env` exists in repo.
+- Duplicate admin trees (`www/admin/pages` vs `www/admin/admin`) can drift.
+- Dev/test endpoints live under `www/dev` and `www/pages/dev` and `www/pages/test`.
 
-### Partials (shared UI -> React components)
-- `www/partials/`: shared UI sections and forms; convert each to React components.
-  - `partials/header.php`, `partials/footer.php`: global shell components.
-  - `partials/home/*`: homepage sections (banners, swipers, promos, newsletters, blog).
-  - `partials/shop/sidebar_filters.php`: category/filter UI for shop pages.
-  - `partials/forms/*`: form components (login, blog add, workshop).
-  - `partials/blog/recent-posts.php`, `partials/theme/banners.json`: blog and banner data sources.
-
-### API (backend endpoints to keep)
-- `www/API/`: JSON or action endpoints; keep PHP/Laravel endpoints as the data source for React.
-  - Auth: `API/auth/*` (login, register, confirm, oauth, forgot password).
-  - Shop: `API/shop/*`, cart flow uses `functions/shop/cart/*`.
-  - Orders: `API/orders/*` (invoice, packing slip, resend).
-  - Shipping: `API/shipping/calculate_shipping.php`, `functions/shipping/*`.
-  - Mail: `API/mail/*`, email confirmations.
-  - Blog: `API/blog/add_blog_post.php`.
-  - OAuth: `API/google/*`, `API/facebook/*`.
-  - AI: `API/AI/*` (chatbot and history).
-  - Webhooks: `API/sendcloud/webhook/index.php`.
-
-### Functions (business logic and helpers)
-- `www/functions/`: PHP business logic; keep as server-side services until replaced.
-  - Shop/cart: `functions/shop/*`, `functions/shop/cart/*`, `functions/categories/*`.
-  - Account: `functions/account/*`.
-  - Newsletter/mail: `functions/newsletter/*`, `functions/mail/*`.
-  - Contact/workshops: `functions/contact/*`, `functions/workshops/*`.
-  - Helpers: `functions/helpers/*`, `functions/GoogleAuthenticator/*`.
-  - Shipping: `functions/shipping/*`.
-  - Admin: `functions/admin/*`.
-  - Dev exports/backups: `functions/dev/*` (legacy references only).
-
-### Admin (admin UI -> separate React app)
-- `www/admin/`: admin UI and tools; plan a separate React+Tailwind admin app.
-  - `admin/pages/*` and `admin/functions/*`: orders, products, customers, promo, newsletter, winkel, magazijn, workshops, tools.
-  - `admin/admin_new/*`: newer admin variant; consolidate into single React admin app.
-  - `admin/voedselproblemen/*`: special workflow area; keep backend PHP and re-skin in React later.
-
-### Styling and scripts (migrate to Tailwind + React)
-- `www/css/*`, `www/assets/scss/*`: legacy CSS/SCSS (bootstrap, flatsome, tailwind outputs); extract tokens into Tailwind config and retire unused CSS.
-- `www/js/*`: swiper, cart, checkout, home scripts; convert to React components/hooks.
-- `www/assets/svg/iconsList.php`: icon source; convert to React icon set or inline SVG components.
-
-### Templates and services (stay server-side for now)
-- `www/templates/*`: email/newsletter templates; keep PHP templates for outgoing mail.
-- `www/classes/*`: PHPMailer, Transip API; keep as PHP backend deps.
-- `www/errors/*`, `www/policies/*`: static content; port as React routes or static assets.
-- `www/py/*`: utility scripts; not part of frontend.
-- `www/glowy/*`: standalone demo; ignore unless marketing wants it.
-- `www/phpmyadmin/*`, `www/lib/*`: vendor trees; do not touch for migration work.
-
-### Data/API contract notes
-- DB schema needed for: shop products/categories, cart/order flows, account/auth, newsletters, workshops, blog, admin reporting. Request relevant table schemas before porting.
-- External services in use: Mollie (payments), Sendcloud/Packlink (shipping), Onfact (invoicing), Google/Facebook OAuth, PHPMailer (email), Transip (domains), AI chatbot endpoint.
-
-## www folder-by-folder migration plan (index.php driven)
-Target: convert all public/admin `index.php` routes into React routes/components. Build/deploy into `subdomains/matthias/dist` with `subdomains/matthias` as the React app root. Keep PHP endpoints in `www/` until React replaces each route.
-
-### www/ (root)
-- Key entry: `www/index.php` -> React route `/`.
-- Shared shell: `www/header.php`, `www/footer.php`, `www/partials/header.php`, `www/partials/footer.php`.
-- Plan: create React App shell + layout, then port homepage sections from `www/partials/home/*`.
-
-### www/pages (public routes)
-- Key entries: all `www/pages/**/index.php` + `www/pages/**/product.php` + `www/pages/**/search.php`.
-- Plan: map each folder to a React route, keep URL structure. Port view logic into React components while keeping `www/API/*` + `www/functions/*` as data sources.
-  - Account: `account/*` (login/register/logout/forgot/bestellingen/accountgegevens/deletion).
-  - Shop: `shop/*` (index, category, search, cart, products/product, promo, deal-van-de-week, orders-tracking, vers, terrazzo, cadeaus, shopping-cart).
-  - Content: `about/`, `over-ons/`, `blogs/`, `contact/`, `privacybeleid/`, `terms_of_service/`, `cookies/`, `uitvaart/`, `workshops/`.
-  - Dev/test: `pages/dev/*`, `pages/test/*` (do not port to React unless needed for QA).
-- Purpose: public storefront and content pages.
-- Dependencies: `www/partials/*`, `www/functions/*` (shop/account/newsletter/contact), `www/API/*` (auth, shop, orders, shipping), session/auth.
-- Styling notes: heavy use of legacy CSS (bootstrap/flatsome/custom), Swiper sliders, and custom JS.
-
-### React route map (from all `www/**/index.php`)
-Public site:
-- `/` -> `www/index.php`
-- `/about` -> `www/pages/about/index.php`
-- `/about/producten/over-epoxyhars` -> `www/pages/about/producten/over-epoxyhars/index.php`
-- `/account` -> `www/pages/account/index.php`
-- `/account/accountgegevens` -> `www/pages/account/accountgegevens/index.php`
-- `/account/accountgegevens/edit` -> `www/pages/account/accountgegevens/edit/index.php`
-- `/account/bestellingen` -> `www/pages/account/bestellingen/index.php`
-- `/account/deletion` -> `www/pages/account/deletion/index.php`
-- `/account/forgot_password` -> `www/pages/account/forgot_password/index.php`
-- `/account/login` -> `www/pages/account/login/index.php`
-- `/account/logout` -> `www/pages/account/logout/index.php`
-- `/account/register` -> `www/pages/account/register/index.php`
-- `/blogs` -> `www/pages/blogs/index.php`
-- `/cadeaus` -> `www/pages/shop/cadeaus/index.php`
-- `/contact` -> `www/pages/contact/index.php`
-- `/cookies` -> `www/pages/cookies/index.php`
-- `/data_deletion` -> `www/pages/data_deletion/index.php`
-- `/over-ons` -> `www/pages/over-ons/index.php`
-- `/privacybeleid` -> `www/pages/privacybeleid/index.php`
-- `/shop` -> `www/pages/shop/index.php`
-- `/shop/cart` -> `www/pages/shop/cart/index.php`
-- `/shop/deal-van-de-week` -> `www/pages/shop/deal-van-de-week/index.php`
-- `/shop/orders-tracking` -> `www/pages/shop/orders-tracking/index.php`
-- `/shop/promo` -> `www/pages/shop/promo/index.php`
-- `/shop/terrazzo` -> `www/pages/shop/terrazzo/index.php`
-- `/shop/vers` -> `www/pages/shop/vers/index.php`
-- `/terms_of_service` -> `www/pages/terms_of_service/index.php`
-- `/uitvaart` -> `www/pages/uitvaart/index.php`
-- `/workshops` -> `www/pages/workshops/index.php`
-- `/workshops/inschrijven` -> `www/pages/workshops/inschrijven/index.php`
-
-Admin (separate React app suggested):
-- `/admin` -> `www/admin/index.php`
-- `/admin/add_pages` -> `www/admin/add_pages/index.php`
-- `/admin/config` -> `www/admin/config/index.php`
-- `/admin/config/opening_times` -> `www/admin/config/opening_times/index.php`
-- `/admin/config/opening_times/vacation` -> `www/admin/config/opening_times/vacation/index.php`
-- `/admin/customers/coupons` -> `www/admin/customers/coupons/index.php`
-- `/admin/pages/blogs` -> `www/admin/pages/blogs/index.php`
-- `/admin/pages/customers` -> `www/admin/pages/customers/index.php`
-- `/admin/pages/deal_van_de_week` -> `www/admin/pages/deal_van_de_week/index.php`
-- `/admin/pages/kantoor` -> `www/admin/pages/kantoor/index.php`
-- `/admin/pages/newsletter` -> `www/admin/pages/newsletter/index.php`
-- `/admin/pages/orders` -> `www/admin/pages/orders/index.php`
-- `/admin/pages/products` -> `www/admin/pages/products/index.php`
-- `/admin/pages/products/add` -> `www/admin/pages/products/add/index.php`
-- `/admin/pages/promo` -> `www/admin/pages/promo/index.php`
-- `/admin/pages/test-mail` -> `www/admin/pages/test-mail/index.php`
-- `/admin/pages/winkel` -> `www/admin/pages/winkel/index.php`
-- `/admin/pages/winkel/producten` -> `www/admin/pages/winkel/producten/index.php`
-- `/admin/pages/winkel/schaplabel` -> `www/admin/pages/winkel/schaplabel/index.php`
-- `/admin/pages/winkel/schappenplan` -> `www/admin/pages/winkel/schappenplan/index.php`
-- `/admin/pages/workshops` -> `www/admin/pages/workshops/index.php`
-- `/admin/tools/mailing` -> `www/admin/tools/mailing/index.php`
-- `/admin/tools/onfact` -> `www/admin/tools/onfact/index.php`
-- `/admin/tools/onfact/debug` -> `www/admin/tools/onfact/debug/index.php`
-- `/admin/voedselproblemen` -> `www/admin/voedselproblemen/index.php`
-- `/admin/admin_new` -> `www/admin/admin_new/index.php`
-- `/admin/admin_new/pages/dashboard` -> `www/admin/admin_new/pages/dashboard/index.php`
-- `/admin/admin_new/pages/orders` -> `www/admin/admin_new/pages/orders/index.php`
-- `/admin/admin_new/pages/products` -> `www/admin/admin_new/pages/products/index.php`
-- `/admin/admin_new/pages/settings` -> `www/admin/admin_new/pages/settings/index.php`
-- `/admin/admin_new/pages/shipments` -> `www/admin/admin_new/pages/shipments/index.php`
- 
-Other (keep server-side, not React):
-- `/errors/403` -> `www/errors/403/index.php`
-- `/errors/404` -> `www/errors/404/index.php`
-- `/phpmyadmin` -> `www/phpmyadmin/index.php`
-- `/api/sendcloud/webhook` -> `www/API/sendcloud/webhook/index.php`
-- `/dev` -> `www/dev/index.php`
-- `/dev/add_pages_tests` -> `www/dev/add_pages_tests/index.php`
-- `/dev/myparcell` -> `www/dev/myparcell/index.php`
-- `/dev/pw-hash` -> `www/dev/pw-hash/index.php`
-- `/pages/dev` -> `www/pages/dev/index.php`
-- `/pages/dev/orders/test_orders` -> `www/pages/dev/orders/test_orders/index.php`
-- `/pages/dev/images` -> `www/pages/dev/images/index.php`
-- `/pages/test` -> `www/pages/test/index.php`
-
-Notes:
-- Additional non-index routes (e.g., `www/pages/shop/products/product.php`, `www/pages/shop/search.php`, `www/pages/blogs/post.php`) should map to React routes but are listed separately when we inventory non-index PHP files.
-
-### React route map (non-index PHP routes)
-Public site:
-- `/blogs/post` -> `www/pages/blogs/post.php`
-- `/pages/about/producten/over-epoxyhars/epoxyhars-garantie` -> `www/pages/about/producten/over-epoxyhars/epoxyhars-garantie.php`
-- `/pages/about/producten/epoxyhars-garantie` -> `www/pages/about/producten/epoxyhars-garantie.php`
-- `/pages/account/bestellingen/detail` -> `www/pages/account/bestellingen/detail.php`
-- `/pages/account/recaptcha_enterprise_verify` -> `www/pages/account/recaptcha_enterprise_verify.php`
-- `/pages/account/login/test_google` -> `www/pages/account/login/test_google.php`
-- `/pages/account/login/login-succes` -> `www/pages/account/login/login-succes.php`
-- `/pages/account/login/googleLogin` -> `www/pages/account/login/googleLogin.php`
-- `/pages/account/login/facebookLogin` -> `www/pages/account/login/facebookLogin.php`
-- `/shop/category` -> `www/pages/shop/category.php`
-- `/shop/search` -> `www/pages/shop/search.php`
-- `/shop/products/product` -> `www/pages/shop/products/product.php`
-- `/shop/shopping-cart/checkout-success` -> `www/pages/shop/shopping-cart/checkout-success.php`
-- `/shop/shopping-cart/send-testmail` -> `www/pages/shop/shopping-cart/send-testmail.php`
-
-Admin (actions/endpoints; keep server-side, do not map to React routes):
-- Admin forms/actions under `www/admin/pages/**` (e.g., orders pdf, delete, update_status; blog add/edit; promo save/add).
-- Admin functions under `www/admin/functions/**` and `www/admin/admin_new/functions/**`.
-- Tools endpoints under `www/admin/tools/**`.
-
-### www/partials (shared UI)
-- Key entries: `partials/header.php`, `partials/footer.php`, `partials/home/*`, `partials/shop/sidebar_filters.php`, `partials/forms/*`, `partials/blog/*`.
-- Plan: convert to reusable React components with Tailwind styling; replace JS-driven sliders with React Swiper components.
-- Purpose: shared UI sections and forms.
-- Dependencies: `www/js/*`, `www/partials/theme/banners.json`, `www/functions/helpers/*`.
-- Styling notes: tied to legacy CSS classes and Swiper markup; needs Tailwind component equivalents.
-
-### www/admin (admin UI)
-- Key entries: all `www/admin/**/index.php` and `www/admin/admin_new/**/index.php`.
-- Plan: separate React admin app under `subdomains/matthias/dist/admin` (route-guarded). Keep PHP admin endpoints in `www/admin/functions/*` + `www/functions/admin/*` until React replaces each view.
-- Purpose: admin dashboards, orders, products, customers, promos, newsletters, tools.
-- Dependencies: `www/admin/functions/*`, `www/functions/admin/*`, `www/functions/shop/*`, admin auth, PDFs/invoices.
-- Styling notes: admin uses bootstrap + custom admin CSS; plan Tailwind admin design system.
-
-### www/API (backend endpoints)
-- Key entries: `www/API/**` (auth, shop, orders, shipping, mail, blog, oauth, AI, webhooks).
-- Plan: keep as backend JSON endpoints; define a typed API client in React; document request/response contracts per endpoint.
-- Purpose: API layer for auth/shop/orders/shipping/mail/blog/AI.
-- Dependencies: `www/functions/*`, `www/classes/*`, external services (Mollie, Sendcloud/Packlink, Onfact, OAuth).
-- Styling notes: n/a (backend).
-
-### www/functions (business logic)
-- Key entries: `www/functions/**` (shop/cart, categories, account, newsletter, mail, contact, workshops, shipping, helpers).
-- Plan: keep server-side; React app consumes through `www/API/*` or new thin PHP endpoints as needed.
-- Purpose: core business logic, DB access, transactions, validation.
-- Dependencies: DB schema, `www/classes/*`, configs, external APIs.
-- Styling notes: n/a (backend).
-
-### www/classes (libraries)
-- Key entries: PHPMailer, Transip API, GoogleAuthenticator.
-- Plan: keep server-side; no React porting.
-- Purpose: third-party PHP libraries.
-- Dependencies: composer/runtime PHP.
-- Styling notes: n/a.
-
-### www/templates (email/newsletter)
-- Key entries: `www/templates/**`.
-- Plan: keep server-side; only adjust if email content must change.
-- Purpose: email/newsletter templates.
-- Dependencies: mail functions and PHPMailer.
-- Styling notes: inline HTML/CSS for email.
-
-### www/css, www/assets, www/js (frontend assets)
-- Key entries: `www/css/*`, `www/assets/scss/*`, `www/js/*`.
-- Plan: extract design tokens into Tailwind config; replace legacy JS with React equivalents; deprecate legacy CSS when React parity achieved.
-- Purpose: legacy styles, vendor CSS/JS, Swiper, Bootstrap, custom scripts.
-- Dependencies: tied to current PHP markup/partials.
-- Styling notes: migrate to Tailwind tokens/components; keep temporary compatibility layer if needed.
-
-### www/errors, www/policies
-- Key entries: `www/errors/**/index.php`, `www/errors/404.html`, `www/policies/*.txt`.
-- Plan: React routes for error pages and policies; keep static fallbacks on server.
-- Purpose: static error/legal content.
-- Dependencies: none.
-- Styling notes: simple content layouts.
-
-### www/config, www/ini.inc
-- Key entries: `www/ini.inc`, `www/config/credentials.json`.
-- Plan: document required env vars for React build and API proxy; never move secrets into frontend.
-- Purpose: runtime config and credentials.
-- Dependencies: server runtime.
-- Styling notes: n/a.
-
-### www/dev, www/py, www/glowy, www/logs, www/phpmyadmin, www/fonts, www/images
-- Plan: do not port to React; treat as tooling/assets/vendor. Keep out of React build unless assets are explicitly needed.
-- Purpose: tooling, logs, vendor/admin tools, assets.
-- Dependencies: n/a for React.
-- Styling notes: n/a.
-
-## React app structure target (deployment)
-- Root: `subdomains/matthias` (project root for React app).
-- Build output: `subdomains/matthias/dist` (deploy-ready assets).
-- Suggested layout:
-  - `subdomains/matthias/src/routes/*` for public routes mapped above.
-  - `subdomains/matthias/src/admin/*` for admin app (or separate app folder if split).
-  - `subdomains/matthias/src/components/*` for shared UI (header/footer/home sections/forms).
-  - `subdomains/matthias/src/api/*` for typed API client wrappers to `www/API/*`.
-  - `subdomains/matthias/src/styles/*` for Tailwind config + tokens derived from legacy CSS.
-  - `subdomains/matthias/public/*` for static assets/mapping.
-  - `.env` (ignored) with a `VITE_API_BASE_URL` pointing at `../www/API`.
-- Deployment notes: keep PHP endpoints in `www/` reachable; configure proxy or base URL for API calls from React.
-- Build/deploy status: `npm install` and `npm run build` succeeded; serve `subdomains/matthias/dist` directly (no `htdocs` folder needed).
-
-## Security findings
-- `www/functions/contact/handle_contact.php` still hard-codes `smtp_host`, `smtp_user`, and `smtp_pass`. Move these credentials into resource config (e.g., `ini.inc`) or server `.env` before we ship the React frontend and update `todo.md` entry 16 accordingly.
-- `www/pages/account/recaptcha_enterprise_verify.php` contains the Recaptcha keys; store them in config and expose only as needed through `www/API/...` endpoints so React never ships secrets.
-- `www/API/facebook/facebookLogout.php` references OAuth secrets; keep those values in environment config and document which keys are required for the new admin/auth flows.
-
-### Current scaffold
-- Created Vite + React + TypeScript project inside `subdomains/matthias` with:
-  - `package.json`, `tsconfig.json`, `tailwind.config.js`, `vite.config.ts`, `index.html`.
-  - `.env.example` for the API base URL and ignored `.env` for secrets.
-  - Starter components: `Header`, `Footer`, sample `HomePage`, Tailwind styles.
-  - Router setup to map `/` to placeholder `HomePage`.
-  - Added `/shop` route (`src/routes/ShopIndex.tsx`) that reuses `fetchFeaturedProducts` with fallback cards.
-  - Outline of future directories (`routes`, `components`, `styles`, public assets).
-  - Gitignore configured to keep only this workspace tracked.
-  - API helper `src/api/shop.ts` with `fetchFeaturedProducts` fallback + logging.
-
-## Route -> API contract mapping (inferred from file names)
-Public storefront:
-- `/` (home): products, categories, banners, deals -> `www/API/shop/*`, `www/functions/shop/products.php`, `www/partials/theme/banners.json`.
-- `/shop` + `/shop/category` + `/shop/search`: product listing/filtering -> `www/API/shop/search_products.php`, `www/API/shop/get_subcategories.php`, `www/functions/shop/products.php`, `www/functions/helpers/product_filters.php`.
-- `/shop/products/product`: product detail -> `www/functions/shop/products.php`, `www/functions/shop/notify_when_available.php`.
-- `/shop/cart`: cart state -> `www/functions/shop/cart/*` (add/remove/apply_coupon/getCartItems/count/get_shipping_methods).
-- `/shop/shopping-cart/checkout-success`: order confirmation -> `www/functions/shop/cart/checkout.php`, `www/API/orders/*`.
-- `/shop/orders-tracking`: tracking -> `www/API/orders/*`, shipping helpers.
-- `/account/login` + `/account/register` + `/account/forgot_password` + `/account/logout`: auth -> `www/API/auth/*`, `www/functions/account/*`.
-- `/account/accountgegevens` + `/account/bestellingen`: account data + orders -> `www/API/orders/*`, `www/functions/account/*`.
-- `/workshops` + `/workshops/inschrijven`: workshops -> `www/functions/workshops/*`, `www/partials/forms/workshop_form.php`.
-- `/blogs` + `/blogs/post`: blog -> `www/API/blog/add_blog_post.php` (admin), plus legacy blog data source (needs schema).
-- `/contact`: contact form -> `www/functions/contact/handle_contact.php`.
-- `/privacybeleid`, `/terms_of_service`, `/cookies`, `/uitvaart`, `/over-ons`, `/about/*`: mostly static content; confirm any dynamic pulls.
-
-Admin (React admin app):
-- Products: `www/admin/pages/products/*`, `www/admin/functions/shop/products/*`, `www/admin/admin_new/functions/products/*`.
-- Orders: `www/admin/pages/orders/*`, `www/API/orders/*`, `www/functions/mail/*`, `www/admin/pages/orders/pdf_*`.
-- Customers: `www/admin/pages/customers/*`.
-- Promo/deals: `www/admin/pages/promo/*`, `www/admin/functions/deals/*`.
-- Newsletter: `www/admin/pages/newsletter/*`, `www/templates/newsletters/*`, `www/functions/newsletter/*`.
-- Workshops: `www/admin/pages/workshops/*`, `www/functions/workshops/*`.
-- Tools: `www/admin/tools/*` (Onfact, mailing).
-- Config: `www/admin/config/*`, `www/functions/admin/*`.
-
-Notes:
-- This mapping is filename-based. Validate contracts by inspecting each PHP file before porting.
-
-## React route/component tree draft (initial)
-Public app (under `subdomains/matthias/src`):
-- `App.tsx`: app shell + route definitions.
-- `layouts/RootLayout.tsx`: header/footer + main outlet.
-- `routes/home/HomePage.tsx`: homepage (`/`).
-- `routes/shop/ShopIndex.tsx`: `/shop` listing.
-- `routes/shop/CategoryPage.tsx`: `/shop/category`.
-- `routes/shop/SearchPage.tsx`: `/shop/search`.
-- `routes/shop/ProductPage.tsx`: `/shop/products/product`.
-- `routes/shop/CartPage.tsx`: `/shop/cart`.
-- `routes/shop/CheckoutSuccess.tsx`: `/shop/shopping-cart/checkout-success`.
-- `routes/shop/OrdersTracking.tsx`: `/shop/orders-tracking`.
-- `routes/shop/PromoPage.tsx`: `/shop/promo`.
-- `routes/shop/DealOfWeek.tsx`: `/shop/deal-van-de-week`.
-- `routes/shop/VersPage.tsx`: `/shop/vers`.
-- `routes/shop/TerrazzoPage.tsx`: `/shop/terrazzo`.
-- `routes/shop/CadeausPage.tsx`: `/shop/cadeaus`.
-- `routes/account/LoginPage.tsx`: `/account/login`.
-- `routes/account/RegisterPage.tsx`: `/account/register`.
-- `routes/account/ForgotPasswordPage.tsx`: `/account/forgot_password`.
-- `routes/account/AccountPage.tsx`: `/account`.
-- `routes/account/AccountDetails.tsx`: `/account/accountgegevens`.
-- `routes/account/AccountDetailsEdit.tsx`: `/account/accountgegevens/edit`.
-- `routes/account/OrdersPage.tsx`: `/account/bestellingen`.
-- `routes/account/OrderDetail.tsx`: `/account/bestellingen/detail`.
-- `routes/account/DeletionPage.tsx`: `/account/deletion`.
-- `routes/content/AboutPage.tsx`: `/about`.
-- `routes/content/AboutEpoxy.tsx`: `/about/producten/over-epoxyhars`.
-- `routes/content/AboutEpoxyGuarantee.tsx`: `/pages/about/producten/over-epoxyhars/epoxyhars-garantie`.
-- `routes/content/AboutGuarantee.tsx`: `/pages/about/producten/epoxyhars-garantie`.
-- `routes/content/OverOnsPage.tsx`: `/over-ons`.
-- `routes/content/BlogsIndex.tsx`: `/blogs`.
-- `routes/content/BlogPost.tsx`: `/blogs/post`.
-- `routes/content/ContactPage.tsx`: `/contact`.
-- `routes/content/PrivacyPage.tsx`: `/privacybeleid`.
-- `routes/content/TermsPage.tsx`: `/terms_of_service`.
-- `routes/content/CookiesPage.tsx`: `/cookies`.
-- `routes/content/UitvaartPage.tsx`: `/uitvaart`.
-- `routes/content/WorkshopsPage.tsx`: `/workshops`.
-- `routes/content/WorkshopsSignup.tsx`: `/workshops/inschrijven`.
-- `routes/system/NotFound.tsx`: 404.
-
-Shared components (under `subdomains/matthias/src/components`):
-- `Header`, `Footer`, `Home/*` sections, `Shop/*` widgets, `Forms/*`, `Banners/*`.
-
-Admin app (under `subdomains/matthias/src/admin`):
-- `AdminApp.tsx`: admin router + auth guard.
-- `routes/Dashboard`, `Products`, `Orders`, `Customers`, `Promo`, `Newsletter`, `Workshops`, `Tools`, `Config`.
-
-API client layer (under `subdomains/matthias/src/api`):
-- `auth.ts`, `shop.ts`, `cart.ts`, `orders.ts`, `shipping.ts`, `newsletter.ts`, `blog.ts`, `workshops.ts`.
-
-Notes:
-- Route list mirrors `www/**` paths to preserve URLs.
-- Admin app can be split into its own Vite/React entry if desired.
-### subdomains/matthias/dist/routes/AboutPage.tsx
-- Ported `www/pages/about/index.php` static content into React component with Tailwind styling.
-- Includes main hero section and contact info.
-- Depends on React header/footer components and Tailwind CSS utilities.
-- To migrate: additional content and any dynamic elements.
+## What this file is for
+- Describe structure and rules so maintenance is consistent.
+- Track how folders are intended to be used.
+- Keep the repo production-safe and PHP-only.

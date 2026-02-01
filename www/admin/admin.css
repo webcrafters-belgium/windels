@@ -1,0 +1,53 @@
+:root {
+  --admin-bg: #030712;
+  --admin-bg-alt: rgba(15, 23, 42, 0.75);
+  --admin-border: rgba(148, 163, 184, 0.1);
+  --admin-text: #f8fafc;
+  --admin-muted: #94a3b8;
+  --admin-accent: #14b8a6;
+  --admin-accent-2: #06b6d4;
+}
+
+body {
+  background: var(--admin-bg);
+  color: var(--admin-text);
+  min-height: 100vh;
+}
+
+.admin-shell {
+  min-height: 100vh;
+  padding: 1.5rem;
+}
+
+.glass, .card-glass, .admin-card {
+  background: var(--admin-bg-alt);
+  border: 1px solid var(--admin-border);
+  border-radius: 1rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+}
+
+.admin-section {
+  margin-bottom: 2rem;
+}
+
+.admin-title {
+  font-weight: 700;
+  color: var(--admin-text);
+}
+
+.admin-muted {
+  color: var(--admin-muted);
+}
+
+.btn, .button, button, input[type="submit"] {
+  border-radius: 0.75rem;
+  border: 1px solid var(--admin-border);
+}
+
+.table, table {
+  color: var(--admin-text);
+}
+
+.table th, table th {
+  color: var(--admin-muted);
+}

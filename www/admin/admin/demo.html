@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="nl" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Windels Green Admin - Demo</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css">
+    <style>
+        :root[data-theme="light"] {
+            --bg-primary: #f0f4f8;
+            --bg-glass: rgba(255, 255, 255, 0.7);
+            --text-primary: #1a202c;
+            --accent: #10b981;
+        }
+        :root[data-theme="dark"] {
+            --bg-primary: #0a0e1a;
+            --bg-glass: rgba(17, 24, 39, 0.7);
+            --text-primary: #f3f4f6;
+            --accent: #10b981;
+        }
+        body {
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            transition: all 0.3s ease;
+        }
+        .glass {
+            background: var(--bg-glass);
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .accent {
+            color: var(--accent);
+        }
+        .accent-bg {
+            background: var(--accent);
+        }
+    </style>
+</head>
+<body class="p-8">
+    <div class="max-w-6xl mx-auto">
+        <!-- Header -->
+        <div class="glass rounded-2xl p-8 mb-8 text-center">
+            <h1 class="text-5xl font-bold mb-4">
+                <i class="bi bi-shop accent"></i>
+                Windels Green & Deco Resin
+            </h1>
+            <h2 class="text-3xl mb-4">Nieuwe Admin Panel</h2>
+            <p class="text-xl mb-6">Glassmorphism Design • Light/Dark Mode • Toegankelijk</p>
+            
+            <div class="flex justify-center gap-4">
+                <a href="/admin/" 
+                   class="accent-bg text-white px-8 py-4 rounded-lg text-xl font-bold hover:opacity-90 transition">
+                    <i class="bi bi-box-arrow-in-right mr-2"></i>
+                    Open Admin Panel
+                </a>
+                
+                <button onclick="toggleTheme()" 
+                        class="glass px-8 py-4 rounded-lg text-xl font-bold hover:opacity-90 transition">
+                    <i class="bi bi-moon-stars mr-2"></i>
+                    Toggle Theme
+                </button>
+            </div>
+        </div>
+        
+        <!-- Features Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+            <div class="glass rounded-xl p-6">
+                <i class="bi bi-palette-fill text-4xl accent mb-3 block"></i>
+                <h3 class="text-2xl font-bold mb-2">Glassmorphism</h3>
+                <p>Modern glass-effect design met blur en transparantie. Professioneel en stijlvol.</p>
+            </div>
+            
+            <div class="glass rounded-xl p-6">
+                <i class="bi bi-sun-fill text-4xl accent mb-3 block"></i>
+                <h3 class="text-2xl font-bold mb-2">Light/Dark Mode</h3>
+                <p>Wissel moeiteloos tussen licht en donker thema. Opgeslagen in je browser.</p>
+            </div>
+            
+            <div class="glass rounded-xl p-6">
+                <i class="bi bi-fire text-4xl accent mb-3 block"></i>
+                <h3 class="text-2xl font-bold mb-2">Kaarsen Tracking</h3>
+                <p>Track Stearine en Paraffine grammen per product automatisch.</p>
+            </div>
+            
+            <div class="glass rounded-xl p-6">
+                <i class="bi bi-circle-square text-4xl accent mb-3 block"></i>
+                <h3 class="text-2xl font-bold mb-2">Terrazzo Tracking</h3>
+                <p>Track Terrazzo poeder met optionele receptuur notities.</p>
+            </div>
+            
+            <div class="glass rounded-xl p-6">
+                <i class="bi bi-droplet-fill text-4xl accent mb-3 block"></i>
+                <h3 class="text-2xl font-bold mb-2">Epoxy Tracking</h3>
+                <p>Houd Epoxy grammen bij voor elk product.</p>
+            </div>
+            
+            <div class="glass rounded-xl p-6">
+                <i class="bi bi-universal-access text-4xl accent mb-3 block"></i>
+                <h3 class="text-2xl font-bold mb-2">Toegankelijk</h3>
+                <p>Groot lettertype toggle, hoog contrast, keyboard-friendly voor alle leeftijden.</p>
+            </div>
+            
+            <div class="glass rounded-xl p-6">
+                <i class="bi bi-shield-check text-4xl accent mb-3 block"></i>
+                <h3 class="text-2xl font-bold mb-2">Veilig</h3>
+                <p>CSRF protectie, SQL injection preventie, activity logging.</p>
+            </div>
+            
+            <div class="glass rounded-xl p-6">
+                <i class="bi bi-truck text-4xl accent mb-3 block"></i>
+                <h3 class="text-2xl font-bold mb-2">Verzendingen</h3>
+                <p>Volledig shipment tracking systeem met carriers en tracking codes.</p>
+            </div>
+            
+            <div class="glass rounded-xl p-6">
+                <i class="bi bi-speedometer2 text-4xl accent mb-3 block"></i>
+                <h3 class="text-2xl font-bold mb-2">Dashboard</h3>
+                <p>Live statistieken, recente bestellingen, voorraad waarschuwingen.</p>
+            </div>
+        </div>
+        
+        <!-- Database Changes -->
+        <div class="glass rounded-2xl p-8 mb-8">
+            <h2 class="text-3xl font-bold mb-6">
+                <i class="bi bi-database accent mr-2"></i>
+                Database Wijzigingen
+            </h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div>
+                    <h3 class="text-xl font-bold mb-3">✅ Nieuwe Tabellen</h3>
+                    <ul class="space-y-2">
+                        <li><code class="bg-gray-800 px-2 py-1 rounded">product_materials</code> - Materiaal tracking</li>
+                        <li><code class="bg-gray-800 px-2 py-1 rounded">admin_activity_log</code> - Audit trail</li>
+                    </ul>
+                </div>
+                
+                <div>
+                    <h3 class="text-xl font-bold mb-3">✅ Uitgebreide Tabellen</h3>
+                    <ul class="space-y-2">
+                        <li><code class="bg-gray-800 px-2 py-1 rounded">products.product_type</code> - Candle/Terrazzo/Epoxy</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="mt-6 p-4 bg-green-500/20 border border-green-500 rounded-lg">
+                <p class="font-bold"><i class="bi bi-check-circle mr-2"></i>100% Backwards Compatible</p>
+                <p class="text-sm mt-2">Alle bestaande data en functionaliteit blijft werken. Geen breaking changes!</p>
+            </div>
+        </div>
+        
+        <!-- Tech Stack -->
+        <div class="glass rounded-2xl p-8">
+            <h2 class="text-3xl font-bold mb-6">
+                <i class="bi bi-code-slash accent mr-2"></i>
+                Tech Stack
+            </h2>
+            
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="text-center p-4 glass rounded-lg">
+                    <i class="bi bi-filetype-php text-4xl accent mb-2 block"></i>
+                    <p class="font-bold">PHP 8+</p>
+                </div>
+                
+                <div class="text-center p-4 glass rounded-lg">
+                    <i class="bi bi-database text-4xl accent mb-2 block"></i>
+                    <p class="font-bold">MySQL</p>
+                </div>
+                
+                <div class="text-center p-4 glass rounded-lg">
+                    <i class="bi bi-filetype-css text-4xl accent mb-2 block"></i>
+                    <p class="font-bold">Tailwind CSS</p>
+                </div>
+                
+                <div class="text-center p-4 glass rounded-lg">
+                    <i class="bi bi-filetype-js text-4xl accent mb-2 block"></i>
+                    <p class="font-bold">Vanilla JS</p>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="text-center mt-8 p-6">
+            <p class="text-lg">Gemaakt met ❤️ door <strong>Emergent AI Agent</strong></p>
+            <p class="text-sm mt-2">25 januari 2026 • Versie 1.0.0</p>
+        </div>
+    </div>
+    
+    <script>
+        function toggleTheme() {
+            const current = document.documentElement.getAttribute('data-theme');
+            const newTheme = current === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+        }
+    </script>
+</body>
+</html>

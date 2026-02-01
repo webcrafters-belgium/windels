@@ -58,3 +58,5 @@ images
 
 *.ini*
 ini.inc
+
+INCOMING (IMAP).txt
