@@ -56,10 +56,11 @@ if ($res && $row = $res->fetch_assoc()) {
                     <input type="text" name="slug" class="bg-[#0f0f0f] border border-gray-800 rounded-xl px-3 py-2" required>
                 </div>
                 <div class="flex flex-col">
-                    <label class="text-sm text-gray-400 mb-1">Afbeelding</label>
-                    <input type="file" id="imageUploader" name="product_image" class="text-gray-300" required>
-                    <img id="selectedImage" src="/images/products/placeholder.png" alt="Product preview" class="w-32 h-32 mt-3 rounded-xl border border-gray-800 object-cover">
-                </div>
+                <label class="text-sm text-gray-400 mb-1">Afbeelding</label>
+                <input type="file" id="imageUploader" name="product_image" class="text-gray-300" required>
+                <img id="selectedImage" src="/images/products/placeholder.png" alt="Product preview" class="w-32 h-32 mt-3 rounded-xl border border-gray-800 object-cover">
+                <p class="text-xs text-gray-500 mt-2">Deze upload komt terecht in <span class="font-medium">/images/products/&lt;categorie&gt;/&lt;variant-sku&gt;/</span> en hoort alleen bij deze variant.</p>
+            </div>
                 <div class="flex flex-col">
                     <label class="text-sm text-gray-400 mb-1">Voorraad</label>
                     <input type="number" name="stock_quantity" class="bg-[#0f0f0f] border border-gray-800 rounded-xl px-3 py-2" min="0" required>
@@ -100,7 +101,15 @@ if ($res && $row = $res->fetch_assoc()) {
                        class="w-full bg-[#0f0f0f] border border-gray-800 rounded-xl px-3 py-2"
                        placeholder="Zoek op naam of SKU…">
                 <input type="hidden" id="parent_id" name="parent_id">
-                <div id="parent_results" class="absolute inset-x-0 mt-1 bg-[#111] border border-gray-800 rounded-xl max-h-64 overflow-auto z-50 glass hidden"></div>
+                <div id="parent_selection" class="hidden mt-2 rounded-xl bg-white/5 px-3 py-2 text-xs text-gray-300 flex items-center justify-between gap-3 border border-gray-800">
+                    <span>Geselecteerd: <span id="parent_label" class="font-semibold">—</span></span>
+                    <button type="button" id="parent_clear" class="text-emerald-300 hover:text-white">Verwijderen</button>
+                </div>
+                <div id="parent_results"
+                     class="absolute inset-x-0 mt-1 bg-[#111] border border-gray-800 rounded-xl max-h-64 overflow-auto z-50 glass hidden">
+                    <div id="parent_results_list" class="divide-y divide-white/5"></div>
+                    <p id="parent_results_message" class="text-xs text-gray-500 px-3 py-2 hidden">Geen resultaten gevonden.</p>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -150,6 +159,11 @@ if ($res && $row = $res->fetch_assoc()) {
         const parentSearch = document.getElementById('parent_search');
         const parentId = document.getElementById('parent_id');
         const resultsBox = document.getElementById('parent_results');
+        const resultsList = document.getElementById('parent_results_list');
+        const resultsMessage = document.getElementById('parent_results_message');
+        const parentSelection = document.getElementById('parent_selection');
+        const parentLabel = document.getElementById('parent_label');
+        const parentClear = document.getElementById('parent_clear');
         const uploader = document.getElementById('imageUploader');
         const preview = document.getElementById('selectedImage');
 
@@ -208,28 +222,65 @@ if ($res && $row = $res->fetch_assoc()) {
 
         parentSearch.addEventListener('input', () => {
             const q = parentSearch.value.trim();
-            resultsBox.innerHTML = '';
+            resultsList.innerHTML = '';
+            resultsMessage.classList.add('hidden');
             resultsBox.classList.add('hidden');
             parentId.value = '';
+            hideSelection();
             if (q.length < 2) return;
             fetch(`/admin/functions/shop/products/search_parent_products.php?q=${encodeURIComponent(q)}`)
                 .then(r => r.json())
                 .then(items => {
-                    if (!items.length) return;
+                    if (!items.length) {
+                        resultsMessage.classList.remove('hidden');
+                        resultsBox.classList.remove('hidden');
+                        return;
+                    }
                     items.forEach(item => {
                         const el = document.createElement('div');
                         el.className = 'px-3 py-2 hover:bg-white/10 cursor-pointer';
                         el.textContent = `${item.sku} – ${item.name}`;
                         el.addEventListener('click', () => {
-                            parentSearch.value = el.textContent;
+                            parentSearch.value = `${item.sku} – ${item.name}`;
                             parentId.value = item.id;
+                            parentLabel.textContent = `${item.sku} – ${item.name}`;
                             resultsBox.classList.add('hidden');
+                            showSelection();
                         });
-                        resultsBox.appendChild(el);
+                        resultsList.appendChild(el);
                     });
                     resultsBox.classList.remove('hidden');
                 });
         });
+
+        parentSearch.addEventListener('focus', () => {
+            if (resultsList.children.length) {
+                resultsBox.classList.remove('hidden');
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            if (!resultsBox.contains(event.target) && event.target !== parentSearch) {
+                resultsBox.classList.add('hidden');
+            }
+        });
+
+        parentClear.addEventListener('click', () => {
+            parentId.value = '';
+            parentSearch.value = '';
+            hideSelection();
+        });
+
+        function showSelection() {
+            parentSelection.classList.remove('hidden');
+        }
+
+        function hideSelection() {
+            parentSelection.classList.add('hidden');
+            parentLabel.textContent = '—';
+        }
+
+        hideSelection();
 
         uploader.addEventListener('change', () => {
             const f = uploader.files[0];
