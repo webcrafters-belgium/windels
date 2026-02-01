@@ -21,6 +21,7 @@
 14. Set up `done.md` entries per folder once React replacements are verified, noting what was migrated and any remaining backend ties.
 15. Track ongoing blockers (missing DB schema, unknown API) and log what info is needed in future updates.
 16. Audit legacy PHP for hard-coded secrets (contact SMTP, Recaptcha) and plan env-based configuration before React releases.
+17. Restore admin glassmorphism styling and redirect legacy `/admin_new` paths to `/admin` (completed 2026-02-01).
 
 ## www folder checklist (React migration readiness)
 - www/ (root index, header/footer) - pending.

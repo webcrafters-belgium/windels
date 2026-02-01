@@ -47,10 +47,10 @@ function isActive($path) {
     <style>
         :root {
             --bg-primary: #0a0f1a;
-            --bg-secondary: #111827;
-            --bg-glass: rgba(15, 23, 42, 0.85);
-            --bg-glass-hover: rgba(15, 23, 42, 0.95);
-            --border-glass: rgba(148, 163, 184, 0.12);
+            --bg-secondary: rgba(15, 23, 42, 0.65);
+            --bg-glass: rgba(15, 23, 42, 0.78);
+            --bg-glass-hover: rgba(15, 23, 42, 0.9);
+            --border-glass: rgba(148, 163, 184, 0.16);
             --text-primary: #f8fafc;
             --text-secondary: #e2e8f0;
             --text-muted: #94a3b8;
@@ -58,6 +58,7 @@ function isActive($path) {
             --accent-secondary: #06b6d4;
             --accent-blue: #3b82f6;
             --glow-color: rgba(45, 212, 191, 0.25);
+            --glass-shadow: 0 20px 40px rgba(2, 6, 23, 0.55);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -84,6 +85,7 @@ function isActive($path) {
             background: var(--bg-glass);
             backdrop-filter: blur(24px) saturate(180%);
             border: 1px solid var(--border-glass);
+            box-shadow: var(--glass-shadow);
         }
 
         .glass-hover:hover {
@@ -96,11 +98,13 @@ function isActive($path) {
             border: 1px solid var(--border-glass);
             border-radius: 1rem;
             transition: all 0.3s ease;
+            box-shadow: 0 12px 30px rgba(2, 6, 23, 0.35);
         }
 
         .card-glass:hover {
             border-color: rgba(20, 184, 166, 0.3);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 18px 40px rgba(2, 6, 23, 0.45);
+            transform: translateY(-2px);
         }
 
         .accent-bg {
@@ -125,11 +129,14 @@ function isActive($path) {
             z-index: 40;
             display: flex;
             flex-direction: column;
+            backdrop-filter: blur(26px) saturate(180%);
+            box-shadow: var(--glass-shadow);
         }
 
         .sidebar-header {
             padding: 1.25rem 1.5rem;
             border-bottom: 1px solid var(--border-glass);
+            background: rgba(15, 23, 42, 0.4);
         }
 
         .sidebar-nav {
@@ -199,6 +206,7 @@ function isActive($path) {
             padding: 1rem 1.25rem;
             border-top: 1px solid var(--border-glass);
             margin-top: auto;
+            background: rgba(15, 23, 42, 0.35);
         }
 
         /* Animations */

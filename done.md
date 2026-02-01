@@ -7,3 +7,4 @@
 - 2026-01-28: Rebuilt site shell in React: new Header with nav/offcanvas placeholders, Footer matching legacy sections, seasonal Snowflakes component, and RootLayout wrapping all routes.
 - 2026-01-28: Updated routing to use RootLayout and added bootstrap-icons CDN to index.html for UI parity.
 - 2026-01-28: Created reusable ProductCard + SidebarFilters components and restyled `/shop` index page with legacy-like static placeholders.
+- 2026-02-01: Restored admin glassmorphism styling and redirected legacy `/admin_new` paths to `/admin` for PHP admin UI.

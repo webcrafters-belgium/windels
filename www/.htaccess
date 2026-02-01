@@ -19,6 +19,10 @@ RewriteEngine On
 RewriteCond %{HTTPS} !=on
 RewriteRule ^ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 
+# Admin new -> admin redirect
+RewriteRule ^admin_new/?$ /admin/ [R=301,L]
+RewriteRule ^admin_new/(.*)$ /admin/$1 [R=301,L]
+
 # Foutpagina's specificeren
 ErrorDocument 400 /errors/400/
 ErrorDocument 403 /errors/403/
