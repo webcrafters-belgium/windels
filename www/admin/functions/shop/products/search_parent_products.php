@@ -1,8 +1,8 @@
-# /admin/functions/shop/products/search_parent_products.php
 <?php
 declare(strict_types=1);
 
 require $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
+require_once __DIR__ . '/parent_column.php';
 header('Content-Type: application/json; charset=utf-8');
 
 $q = isset($_GET['q']) ? trim($_GET['q']) : '';
@@ -12,6 +12,11 @@ if ($q === '' || mb_strlen($q) < 2) {
 }
 
 $like = '%' . $q . '%';
+
+if (!ensureProductParentColumn($conn)) {
+    echo json_encode([]);
+    exit;
+}
 
 // Alleen top-level (parent_id IS NULL) tonen als potentiële parent
 $sql = "

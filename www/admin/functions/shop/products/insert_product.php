@@ -4,6 +4,7 @@ error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include($_SERVER['DOCUMENT_ROOT'] . '/ini.inc');
+require_once __DIR__ . '/parent_column.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -39,6 +40,11 @@ $sale_price = ($sale_price_raw === '' ? null : $sale_price_raw);
 // Parent-id casten of NULL
 $parent_id = ($parent_id_raw === '' || $parent_id_raw === null) ? null : (int)$parent_id_raw;
 
+$parentColumnAvailable = ensureProductParentColumn($conn);
+if (!$parentColumnAvailable) {
+    $parent_id = null;
+}
+
 // --- Validatie ---
 if (!preg_match('/^\d+-\d+$/', $sku)) {
     $errors[] = "❌ SKU is ongeldig. Verwacht formaat: {categorie-id}-{nummer}.";
@@ -70,7 +76,7 @@ foreach ([
 }
 
 // Als parent is opgegeven: moet bestaan en zelf géén parent hebben (top-level)
-if ($parent_id !== null) {
+if ($parentColumnAvailable && $parent_id !== null) {
     $stmt_p = $conn->prepare("SELECT id FROM products WHERE id = ? AND parent_id IS NULL LIMIT 1");
     $stmt_p->bind_param("i", $parent_id);
     $stmt_p->execute();
@@ -109,9 +115,7 @@ try {
         'name', 'slug', 'sku', 'type',
         'description', 'short_description',
         'price', 'regular_price', 'sale_price',
-        'stock_quantity', 'stock_status',
-        'parent_id',
-        'created_at', 'updated_at'
+        'stock_quantity', 'stock_status'
     ];
 
     $base_values = [
@@ -126,12 +130,25 @@ try {
         $sale_price,
         $stock,
         $stock_status,
-        $parent_id,
-        $created_at,
-        $updated_at
     ];
 
-    $base_types = 'sssssssssisiss';
+    $base_types = 'sssssssssiss';
+
+    $all_columns = $base_columns;
+    $all_values = $base_values;
+    $all_types = $base_types;
+
+    if ($parentColumnAvailable) {
+        $all_columns[] = 'parent_id';
+        $all_values[] = $parent_id;
+        $all_types .= 'i';
+    }
+
+    $all_columns[] = 'created_at';
+    $all_values[] = $created_at;
+    $all_columns[] = 'updated_at';
+    $all_values[] = $updated_at;
+    $all_types .= 'ss';
 
     $optional_definitions = [
         'amount_grams' => $amount_grams,
@@ -151,10 +168,6 @@ try {
         $stmt_col->free_result();
         $stmt_col->close();
     }
-
-    $all_columns = $base_columns;
-    $all_values = $base_values;
-    $all_types = $base_types;
 
     foreach ($optional_columns as $column => $value) {
         $all_columns[] = $column;
