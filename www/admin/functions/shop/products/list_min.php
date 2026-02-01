@@ -1,5 +1,5 @@
 <?php
-// Lightweight JSON product list for admin React UI
+// Lightweight JSON product list for admin UI
 require $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
 header('Content-Type: application/json');
 
