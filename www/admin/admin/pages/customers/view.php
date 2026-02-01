@@ -221,7 +221,7 @@ if ($dbAvailable && $customer) {
                                         </span>
                                     </td>
                                     <td class="py-4 px-4 text-right">
-                                        <a href="/admin/pages/orders/view.php?id=<?= $order['id'] ?>" 
+                                        <a href="/admin/pages/orders/detail.php?id=<?= $order['id'] ?>" 
                                            class="px-3 py-1 rounded-lg glass-hover accent-primary font-semibold text-sm">
                                             <i class="bi bi-eye"></i>
                                         </a>

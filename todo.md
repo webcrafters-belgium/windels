@@ -1,26 +1,25 @@
-# TODO — Windels (PHP Production)
+# TODO — Windels Admin herstel & migratie
 
-## P0 — Stability (production must stay online)
-- [ ] Verify admin root and dashboard still load (200, no fatal).
-- [ ] Verify public home, product page, and cart page load.
-- [ ] Map which admin tree is canonical: `www/admin/pages/**` vs `www/admin/admin/**`.
-- [ ] Remove or guard any admin include that hard-fails on missing DB.
+## P0 — Admin terug werkend
+- [ ] Discovery: identificeer entrypoint + routing (paths + files)
+- [ ] Reproduceer fout + noteer exacte error/stacktrace
+- [ ] Fix blocker (minimale patch, geen removals)
+- [ ] Verifieer: admin URL 200 + dashboard render
+- [ ] Verifieer: login (indien relevant)
+- [ ] Build check (indien frontend): npm run build
 
-## P1 — Security & secrets
-- [ ] Move secrets out of `www/ini.inc` and `www/.env` into deployment-only config.
-- [ ] Add `ini.inc.example` and `.env.example` with placeholders (no secrets).
-- [ ] Confirm `.gitignore` excludes `.env`, `ini.inc`, and dumps.
+## P1 — Oude dashboard layout terug (4 blokken)
+- [ ] Vind oude layout bron (files/commit/branch)
+- [ ] Restore HTML/CSS 1:1
+- [ ] Verifieer UI + build
 
-## P2 — Dev/test exposure
-- [ ] Audit `www/dev/**`, `www/pages/dev/**`, `www/pages/test/**`, `www/API/dev/**`.
-- [ ] Add access guards or disable public exposure of dev/test routes.
-- [ ] Identify any writable endpoints without auth.
+## P2 — admin_new -> huidige admin (1:1)
+- [ ] Inventaris admin_new pages/modules
+- [ ] Mapping naar huidige admin
+- [ ] Migratie per module (met verify per stap)
+- [ ] Cleanup zonder removals (alleen dode links na migratie fixen)
 
-## P3 — Admin cleanup (no feature removals)
-- [ ] Inventory admin pages, functions, tools, and links.
-- [ ] Align headers/footers and shared styles across admin pages.
-- [ ] Document any duplicate pages between `admin/pages` and `admin/admin`.
-
-## P4 — Documentation
-- [ ] Update `README.md` with run/deploy notes (PHP-only).
-- [ ] Update `www/todo.php` with current admin tasks and risks.
+## P3 — Afwerking
+- [ ] Smoke test flows
+- [ ] Documenteer run/deploy stappen kort
+- [ ] Final build + commit

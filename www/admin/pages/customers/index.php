@@ -76,7 +76,15 @@ $result = $stmt->get_result();
                         <td class="py-4 px-4">
                             <div class="flex items-center space-x-3">
                                 <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-violet-500/30 to-purple-500/30 flex items-center justify-center text-sm font-bold text-violet-400">
-                                    <?= strtoupper(substr($row['first_name'], 0, 1) . substr($row['last_name'], 0, 1)) ?>
+                                    <?php
+                                        $firstInitial = mb_substr((string)($row['first_name'] ?? ''), 0, 1, 'UTF-8');
+                                        $lastInitial = mb_substr((string)($row['last_name'] ?? ''), 0, 1, 'UTF-8');
+                                        $initials = strtoupper($firstInitial . $lastInitial);
+                                        if ($initials === '') {
+                                            $initials = '?';
+                                        }
+                                    ?>
+                                    <?= htmlspecialchars($initials) ?>
                                 </div>
                                 <span class="font-semibold"><?= htmlspecialchars($row['first_name'] . ' ' . $row['last_name']) ?></span>
                             </div>

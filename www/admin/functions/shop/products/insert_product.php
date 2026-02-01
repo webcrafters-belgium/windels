@@ -29,6 +29,10 @@ $parent_id_raw      = $_POST['parent_id'] ?? ''; // kan leeg zijn
 $created_at         = date('Y-m-d H:i:s');
 $updated_at         = $created_at;
 
+$amount_grams       = trim($_POST['amount_grams'] ?? '');
+$paraffin_percentage = trim($_POST['paraffin_percentage'] ?? '');
+$stearin_percentage  = trim($_POST['stearin_percentage'] ?? '');
+
 // Sale price naar NULL indien leeg
 $sale_price = ($sale_price_raw === '' ? null : $sale_price_raw);
 
@@ -53,6 +57,16 @@ if ($regular_price !== '' && !preg_match('/^\d+(\.\d{1,2})?$/', $regular_price))
 }
 if ($sale_price !== null && $sale_price !== '' && !preg_match('/^\d+(\.\d{1,2})?$/', $sale_price)) {
     $errors[] = "❌ Actieprijs heeft een ongeldig formaat.";
+}
+
+foreach ([
+    'amount_grams' => $amount_grams,
+    'paraffin_percentage' => $paraffin_percentage,
+    'stearin_percentage' => $stearin_percentage
+] as $field => $value) {
+    if ($value !== '' && !is_numeric($value)) {
+        $errors[] = "❌ {$field} moet een getal zijn (laat leeg als niet van toepassing).";
+    }
 }
 
 // Als parent is opgegeven: moet bestaan en zelf géén parent hebben (top-level)
@@ -91,24 +105,16 @@ $conn->begin_transaction();
 try {
     // Product inserten (met parent_id)
     // Let op: sale_price kan NULL zijn → we binden als string en zetten via conditional set_null
-    $sql = "
-        INSERT INTO products (
-            name, slug, sku, type,
-            description, short_description,
-            price, regular_price, sale_price,
-            stock_quantity, stock_status,
-            parent_id,
-            created_at, updated_at
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ";
-    $stmt = $conn->prepare($sql);
+    $base_columns = [
+        'name', 'slug', 'sku', 'type',
+        'description', 'short_description',
+        'price', 'regular_price', 'sale_price',
+        'stock_quantity', 'stock_status',
+        'parent_id',
+        'created_at', 'updated_at'
+    ];
 
-    // Voor mysqli bind: NULL kan mee als parameter; met mysqlnd blijft het NULL.
-    // Types: name(s), slug(s), sku(s), type(s), description(s), short(s),
-    // price(s), regular_price(s), sale_price(s|NULL), stock_quantity(i), stock_status(s),
-    // parent_id(i|NULL), created_at(s), updated_at(s)
-    $stmt->bind_param(
-        "sssssssssisiss",
+    $base_values = [
         $name,
         $slug,
         $sku,
@@ -117,13 +123,65 @@ try {
         $short_description,
         $price,
         $regular_price,
-        $sale_price,     // mag NULL zijn
+        $sale_price,
         $stock,
         $stock_status,
-        $parent_id,      // mag NULL zijn
+        $parent_id,
         $created_at,
         $updated_at
+    ];
+
+    $base_types = 'sssssssssisiss';
+
+    $optional_definitions = [
+        'amount_grams' => $amount_grams,
+        'paraffin_percentage' => $paraffin_percentage,
+        'stearin_percentage' => $stearin_percentage,
+    ];
+
+    $optional_columns = [];
+    foreach ($optional_definitions as $column => $value) {
+        $stmt_col = $conn->prepare("SHOW COLUMNS FROM products LIKE ?");
+        $stmt_col->bind_param("s", $column);
+        $stmt_col->execute();
+        $stmt_col->store_result();
+        if ($stmt_col->num_rows > 0) {
+            $optional_columns[$column] = ($value === '' ? null : $value);
+        }
+        $stmt_col->free_result();
+        $stmt_col->close();
+    }
+
+    $all_columns = $base_columns;
+    $all_values = $base_values;
+    $all_types = $base_types;
+
+    foreach ($optional_columns as $column => $value) {
+        $all_columns[] = $column;
+        $all_values[] = $value;
+        $all_types .= 's';
+    }
+
+    $placeholders = implode(', ', array_fill(0, count($all_columns), '?'));
+    $sql = sprintf(
+        "INSERT INTO products (%s) VALUES (%s)",
+        implode(', ', $all_columns),
+        $placeholders
     );
+    $stmt = $conn->prepare($sql);
+    if (!$stmt) {
+        throw new Exception("Fout bij voorbereiden product insert: " . $conn->error);
+    }
+
+    $params = array_merge([$all_types], $all_values);
+    $refs = [];
+    foreach ($params as $key => $value) {
+        $refs[$key] = &$params[$key];
+    }
+
+    if (!call_user_func_array([$stmt, 'bind_param'], $refs)) {
+        throw new Exception("Fout bij binden productwaarden: " . $stmt->error);
+    }
 
     if (!$stmt->execute()) {
         throw new Exception("Fout bij toevoegen product: " . $stmt->error);

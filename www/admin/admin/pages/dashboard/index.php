@@ -235,7 +235,7 @@ if ($dbAvailable) {
                             </td>
                             <td class="py-4 px-4 text-sm" style="color: var(--text-muted);"><?= date('d M, H:i', strtotime($order['created_at'])) ?></td>
                             <td class="py-4 px-4 text-right">
-                                <a href="/admin/pages/orders/view.php?id=<?= $order['id'] ?>" 
+                                <a href="/admin/pages/orders/detail.php?id=<?= $order['id'] ?>" 
                                    class="inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-semibold text-teal-400 hover:bg-teal-500/20 transition-colors"
                                    data-testid="view-order-<?= $order['id'] ?>">
                                     <i class="bi bi-eye-fill mr-1.5"></i> Bekijk

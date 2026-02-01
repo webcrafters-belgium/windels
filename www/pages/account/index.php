@@ -109,7 +109,7 @@ $q->close();
                             <td>".date('d-m-Y',strtotime($o['created_at']))."</td>
                             <td>{$o['status']}</td>
                             <td>
-                                <a class='btn-outline' href='/pages/account/orders/view.php?order_id={$o['id']}'>
+                                <a class='btn-outline' href='/pages/account/orders/detail.php?order_id={$o['id']}'>
                                     Bekijken
                                 </a>
                             </td>
