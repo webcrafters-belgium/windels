@@ -7,6 +7,8 @@ require $_SERVER['DOCUMENT_ROOT'] . '/functions/helpers/shop_helpers.php';
 require $_SERVER['DOCUMENT_ROOT'] . '/functions/helpers/vacation_helpers.php';
 
 $pagetitle = "Windels Green & Deco Resin | Epoxy, Terrazzo & Kaarsen";
+$seoDescription = "Ontdek bij Windels unieke epoxy, terrazzo en kaarsen die lokaal handgemaakt en duurzaam afgewerkt zijn.";
+$seoImage = "https://windelsgreen-decoresin.com/images/layout/new_index/eco-resin-mini-tray-terrazzo-craft-workshop-edinburgh-portrait-big.png";
 $products = getRandomProducts($conn, 20);
 
 include $_SERVER['DOCUMENT_ROOT'] . '/header.php';
@@ -668,4 +670,3 @@ if ($blogRes && $blogRes->num_rows > 0) {
 <?php
 
 include $_SERVER['DOCUMENT_ROOT'] . '/footer.php';
-

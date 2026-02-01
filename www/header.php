@@ -15,6 +15,41 @@ function e($value): string {
 
 global $count;
 $count = $count ?? 0;
+
+// SEO defaults (overridable before including header)
+$siteBaseUrl = 'https://windelsgreen-decoresin.com';
+$currentRequest = $_SERVER['REQUEST_URI'] ?? '/';
+$pathOnly = strtok($currentRequest, '?');
+$canonicalUrl = $canonical ?? rtrim($siteBaseUrl, '/') . ($pathOnly ?: '/');
+$seoTitle = $pagetitle ?? 'Windels Green & Deco Resin | Epoxy, terrazzo & kaarsen';
+$seoDescription = trim($seoDescription ?? 'Windels Green & Deco Resin maakt unieke epoxy, terrazzo en kaarsen met oog voor handwerk en duurzame afwerking.');
+$seoKeywords = trim($seoKeywords ?? 'windels, resin, epoxy, terrazzo, kaarsen, handgemaakt, Belgisch, atelier');
+$seoImage = $seoImage ?? $siteBaseUrl . '/images/layout/new_index/eco-resin-mini-tray-terrazzo-craft-workshop-edinburgh-portrait-big.png';
+$ogType = $ogType ?? 'website';
+$organizationSchema = [
+    '@context' => 'https://schema.org',
+    '@type' => 'Organization',
+    'name' => $bedrijfsnaam ?? 'Windels Green & Deco Resin',
+    'url' => $siteBaseUrl,
+    'logo' => $siteBaseUrl . ($bedrijfslogo ?? '/images/windels-logo.svg'),
+    'contactPoint' => [
+        [
+            '@type' => 'ContactPoint',
+            'telephone' => $bedrijfstelefoon ?? '+3211753319',
+            'contactType' => 'customer service',
+            'areaServed' => 'BE',
+            'availableLanguage' => 'Dutch'
+        ]
+    ],
+    'address' => [
+        '@type' => 'PostalAddress',
+        'streetAddress' => 'Beukenlaan 8',
+        'addressLocality' => 'Hamont-Achel',
+        'postalCode' => '3930',
+        'addressCountry' => 'BE'
+    ]
+];
+$schemaJson = json_encode($organizationSchema, JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
 ?>
 
 
@@ -22,10 +57,28 @@ $count = $count ?? 0;
 <html lang="nl">
 <head>
     <meta charset="utf-8">
-    <title><?= $pagetitle ?? "Windels Deco & Resin"; ?></title>
+    <title><?= e($seoTitle); ?></title>
 
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="author" content="Gielen Matthias">
+    <meta name="description" content="<?= e($seoDescription); ?>">
+    <meta name="keywords" content="<?= e($seoKeywords); ?>">
+    <meta name="robots" content="index, follow">
+    <link rel="canonical" href="<?= e($canonicalUrl); ?>">
+    <meta property="og:locale" content="nl_BE">
+    <meta property="og:site_name" content="Windels Green & Deco Resin">
+    <meta property="og:type" content="<?= e($ogType); ?>">
+    <meta property="og:title" content="<?= e($seoTitle); ?>">
+    <meta property="og:description" content="<?= e($seoDescription); ?>">
+    <meta property="og:url" content="<?= e($canonicalUrl); ?>">
+    <meta property="og:image" content="<?= e($seoImage); ?>">
+    <meta property="og:image:secure_url" content="<?= e($seoImage); ?>">
+    <meta property="og:image:alt" content="Windels Green & Deco Resin handgemaakte creaties">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<?= e($seoTitle); ?>">
+    <meta name="twitter:description" content="<?= e($seoDescription); ?>">
+    <meta name="twitter:image" content="<?= e($seoImage); ?>">
+    <meta name="twitter:creator" content="@windelsgreen">
     <meta name="theme-color" content="#3c8c72">
 
     <link rel="icon" href="/favicon.ico">
@@ -52,6 +105,9 @@ $count = $count ?? 0;
             'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
         })(window,document,'script','dataLayer','GTM-MWSH4NMH');</script>
     <!-- End Google Tag Manager -->
+    <script type="application/ld+json">
+        <?= $schemaJson ?: '{}'; ?>
+    </script>
 </head>
 
 <body class="site-body">
