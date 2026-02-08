@@ -214,11 +214,14 @@ $invoicePath = $tempDir . "/factuur_{$orderId}.pdf";
 $packingPath = $tempDir . "/pakbon_{$orderId}.pdf";
 file_put_contents($invoicePath, buildInvoicePdfString($order, $items));
 file_put_contents($packingPath, buildPackingPdfString($order, $items));
+$xmlPath = $tempDir . "/factuur_{$orderId}.xml";
+file_put_contents($xmlPath, buildInvoiceXmlString($order, $items));
 $debugSteps[] = "📄 Factuur en pakbon aangemaakt.";
+$debugSteps[] = "🧾 XML-factuur aangemaakt.";
 
 // ───────────── Mails ─────────────
 try {
-    sendAdminMail($orderId, $totalPrice, (float)$order['shipping_cost'], $invoicePath, $packingPath);
+    sendAdminMail($orderId, $totalPrice, (float)$order['shipping_cost'], $invoicePath, $packingPath, $xmlPath);
     $debugSteps[] = "📧 Adminmail verzonden.";
     if (!empty($order['email'])) {
         sendConfirmationEmail($orderId, $totalPrice, (float)$order['shipping_cost'], $order['email'], $invoicePath, $barcode);
@@ -228,6 +231,7 @@ try {
     $debugSteps[] = "❌ Mail error: ".$e->getMessage();
 } finally {
     @unlink($invoicePath); @unlink($packingPath);
+    @unlink($xmlPath);
 }
 
 // ───────────── HTML ─────────────

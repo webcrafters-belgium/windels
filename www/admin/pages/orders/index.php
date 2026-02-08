@@ -40,6 +40,27 @@ $stmt->execute($p);
 $result = $stmt->get_result();
 ?>
 
+<style>
+    .invoice-dropdown-panel {
+        background: rgba(15, 23, 42, 0.95);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35);
+        min-width: 11rem;
+        padding: 0.35rem 0;
+        border-radius: 1rem;
+        backdrop-filter: blur(18px) saturate(180%);
+    }
+
+    .invoice-dropdown-panel a {
+        color: var(--text-secondary);
+    }
+
+    .invoice-dropdown-panel a:hover {
+        background: rgba(255, 255, 255, 0.08);
+        color: var(--text-primary);
+    }
+</style>
+
 <!-- PAGE HEADER -->
 <div class="mb-8">
     <div class="flex items-center justify-between">
@@ -186,9 +207,20 @@ $result = $stmt->get_result();
                                 <a href="/API/orders/resend_confirmation/resend_confirmation.php?order_id=<?= $order['id'] ?>" class="p-2 rounded-lg glass-hover text-indigo-400 hover:bg-indigo-500/20" title="Verstuur">
                                     <i class="bi bi-send-fill"></i>
                                 </a>
-                                <a href="/API/orders/download_invoice.php?order_id=<?= $order['id'] ?>" class="p-2 rounded-lg glass-hover hover:bg-white/10" title="Factuur" style="color: var(--text-muted);">
-                                    <i class="bi bi-file-earmark-text-fill"></i>
-                                </a>
+                                <div class="relative group">
+                                    <button type="button" class="p-2 rounded-lg glass-hover hover:bg-white/10 flex items-center gap-1 text-sm" title="Factuuropties" style="color: var(--text-muted);">
+                                        <i class="bi bi-file-earmark-text-fill"></i>
+                                        <span class="sr-only">Factuur</span>
+                                    </button>
+                                    <div class="absolute right-0 mt-2 w-40 invoice-dropdown-panel shadow-lg glass text-sm z-10 hidden group-hover:block">
+                                        <a href="/API/orders/download_invoice.php?order_id=<?= $order['id'] ?>" class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800" target="_blank">
+                                            <i class="bi bi-file-earmark-pdf-fill me-2"></i>PDF
+                                        </a>
+                                        <a href="/admin/pages/orders/xml_invoice.php?id=<?= $order['id'] ?>" class="block px-4 py-2 hover:bg-slate-100 dark:hover:bg-slate-800" target="_blank">
+                                            <i class="bi bi-code-slash me-2"></i>XML
+                                        </a>
+                                    </div>
+                                </div>
                                 <a href="/API/orders/packing_slip.php?order_id=<?= $order['id'] ?>" class="p-2 rounded-lg glass-hover text-emerald-400 hover:bg-emerald-500/20" title="Pakbon">
                                     <i class="bi bi-box-seam-fill"></i>
                                 </a>

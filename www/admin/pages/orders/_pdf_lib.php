@@ -223,3 +223,244 @@ function buildPackingPdfString(array $order, array $items): string {
 
     return $pdf->Output('S');
 }
+
+function addCbcElement(DOMDocument $doc, DOMElement $parent, string $name, ?string $value, array $attributes = []): DOMElement {
+    $element = $doc->createElement('cbc:' . $name);
+    if ($value !== null && $value !== '') {
+        $element->appendChild($doc->createTextNode($value));
+    }
+    foreach ($attributes as $attr => $attrValue) {
+        $element->setAttribute($attr, $attrValue);
+    }
+    $parent->appendChild($element);
+    return $element;
+}
+
+function normalizeCountryCode(?string $raw): string {
+    $raw = trim((string)$raw);
+    if ($raw === '') {
+        return 'BE';
+    }
+    $map = [
+        'belgië'      => 'BE', 'belgie'      => 'BE', 'belgium'    => 'BE',
+        'nederland'   => 'NL', 'netherlands' => 'NL', 'nl'         => 'NL',
+        'frankrijk'   => 'FR', 'france'      => 'FR', 'fr'         => 'FR',
+        'duitsland'   => 'DE', 'germany'     => 'DE', 'de'         => 'DE',
+        'luxemburg'   => 'LU', 'luxembourg'  => 'LU', 'lu'         => 'LU',
+        'zwitserland' => 'CH', 'switzerland' => 'CH', 'ch'         => 'CH',
+        'italië'      => 'IT', 'italie'      => 'IT', 'italy'      => 'IT', 'it' => 'IT',
+        'spanje'      => 'ES', 'españa'      => 'ES', 'spain'      => 'ES', 'es' => 'ES',
+        'polen'       => 'PL', 'poland'      => 'PL', 'pl'         => 'PL',
+    ];
+    $lower = mb_strtolower($raw);
+    if (isset($map[$lower])) {
+        return $map[$lower];
+    }
+    if (mb_strlen($raw) === 2) {
+        return mb_strtoupper($raw);
+    }
+    return 'BE';
+}
+
+function formatXmlNumber(float $value): string {
+    return number_format(round($value, 2), 2, '.', '');
+}
+
+function buildInvoiceXmlString(array $order, array $items): string {
+    global $bedrijfsnaam, $bedrijfsadres, $bedrijfsBTWnr, $bedrijfsemail, $bedrijfstelefoon;
+
+    $vatPercent = 21.0;
+    $vatFactor = 1 + ($vatPercent / 100);
+
+    $shippingIncl = max(0.0, (float)($order['shipping_cost'] ?? 0.0));
+    $shippingExcl = $shippingIncl / $vatFactor;
+
+    $doc = new DOMDocument('1.0', 'UTF-8');
+    $doc->formatOutput = true;
+    $invoice = $doc->createElement('Invoice');
+    $doc->appendChild($invoice);
+    $invoice->setAttribute('xmlns', 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2');
+    $invoice->setAttribute('xmlns:cac', 'urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2');
+    $invoice->setAttribute('xmlns:cbc', 'urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2');
+    $invoice->setAttribute('xmlns:ext', 'urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2');
+    $invoice->setAttribute('xmlns:xsi', 'http://www.w3.org/2001/XMLSchema-instance');
+    $invoice->setAttribute('xsi:schemaLocation', 'urn:oasis:names:specification:ubl:schema:xsd:Invoice-2 http://docs.oasis-open.org/ubl/os-UBL-2.1/xml/maindoc/UBL-Invoice-2.1.xsd');
+
+    $issueDate = (new DateTimeImmutable($order['created_at'] ?? 'now'))->format('Y-m-d');
+    $dueDate = (new DateTimeImmutable($order['created_at'] ?? 'now'))->modify('+14 days')->format('Y-m-d');
+    $invoiceNumber = 'INV-' . str_pad((string)$order['id'], 6, '0', STR_PAD_LEFT);
+
+    addCbcElement($doc, $invoice, 'UBLVersionID', '2.1');
+    addCbcElement($doc, $invoice, 'CustomizationID', 'urn:cen.eu:en16931:2017');
+    addCbcElement($doc, $invoice, 'ProfileID', 'urn:fdc:peppol.eu:2017:poacc:billing:01:1.0');
+    addCbcElement($doc, $invoice, 'ID', $invoiceNumber);
+    addCbcElement($doc, $invoice, 'IssueDate', $issueDate);
+    addCbcElement($doc, $invoice, 'DocumentCurrencyCode', 'EUR');
+    addCbcElement($doc, $invoice, 'InvoiceTypeCode', '380');
+
+    $addressLines = array_filter(array_map('trim', preg_split('/\\r?\\n/', (string)$bedrijfsadres)));
+    $companyStreet = $addressLines[0] ?? '';
+    $companyPostalLine = $addressLines[1] ?? '';
+    $companyCountryLine = $addressLines[2] ?? '';
+    $companyPostalZone = '';
+    $companyCity = $companyPostalLine;
+    if (preg_match('/^(\\d{3,4})\\s*(.+)$/u', $companyPostalLine, $matches)) {
+        $companyPostalZone = $matches[1];
+        $companyCity = $matches[2];
+    }
+    $supplierCountryCode = normalizeCountryCode($companyCountryLine);
+
+    $supplierParty = $doc->createElement('cac:AccountingSupplierParty');
+    $supplier = $doc->createElement('cac:Party');
+    addCbcElement($doc, $supplier, 'Name', $bedrijfsnaam);
+    $supplierAddress = $doc->createElement('cac:PostalAddress');
+    addCbcElement($doc, $supplierAddress, 'StreetName', $companyStreet);
+    addCbcElement($doc, $supplierAddress, 'CityName', $companyCity);
+    if ($companyPostalZone !== '') {
+        addCbcElement($doc, $supplierAddress, 'PostalZone', $companyPostalZone);
+    }
+    $countryEl = $doc->createElement('cac:Country');
+    addCbcElement($doc, $countryEl, 'IdentificationCode', $supplierCountryCode);
+    $supplierAddress->appendChild($countryEl);
+    $supplier->appendChild($supplierAddress);
+    $supplierContact = $doc->createElement('cac:Contact');
+    addCbcElement($doc, $supplierContact, 'Telephone', $bedrijfstelefoon);
+    addCbcElement($doc, $supplierContact, 'ElectronicMail', $bedrijfsemail);
+    $supplier->appendChild($supplierContact);
+    $taxScheme = $doc->createElement('cac:PartyTaxScheme');
+    addCbcElement($doc, $taxScheme, 'CompanyID', $bedrijfsBTWnr);
+    $taxSchemeInner = $doc->createElement('cac:TaxScheme');
+    addCbcElement($doc, $taxSchemeInner, 'ID', 'VAT');
+    $taxScheme->appendChild($taxSchemeInner);
+    $supplier->appendChild($taxScheme);
+    $supplierParty->appendChild($supplier);
+    $invoice->appendChild($supplierParty);
+
+    $customerCountryCode = normalizeCountryCode($order['country']);
+    $customerParty = $doc->createElement('cac:AccountingCustomerParty');
+    $customer = $doc->createElement('cac:Party');
+    addCbcElement($doc, $customer, 'Name', $order['name'] ?? '');
+    $customerAddress = $doc->createElement('cac:PostalAddress');
+    addCbcElement($doc, $customerAddress, 'StreetName', trim(($order['street'] ?? '') . ' ' . ($order['number'] ?? '')));
+    addCbcElement($doc, $customerAddress, 'CityName', $order['city'] ?? '');
+    addCbcElement($doc, $customerAddress, 'PostalZone', $order['zipcode'] ?? '');
+    $countryCust = $doc->createElement('cac:Country');
+    addCbcElement($doc, $countryCust, 'IdentificationCode', $customerCountryCode);
+    $customerAddress->appendChild($countryCust);
+    $customer->appendChild($customerAddress);
+    $customerContact = $doc->createElement('cac:Contact');
+    addCbcElement($doc, $customerContact, 'Telephone', $order['phone'] ?? '');
+    addCbcElement($doc, $customerContact, 'ElectronicMail', $order['email'] ?? '');
+    $customer->appendChild($customerContact);
+    $customerParty->appendChild($customer);
+    $invoice->appendChild($customerParty);
+
+    $paymentMeans = $doc->createElement('cac:PaymentMeans');
+    $paymentFields = [
+        'bancontact'       => '42',
+        'card'             => '42',
+        'bancontactmrcash' => '42',
+        'ideal'            => '42',
+        'paypal'           => '42',
+        'banktransfer'     => '31',
+        'overschrijving'   => '31',
+        'transfer'         => '31',
+        'stripe'           => '42',
+    ];
+    $methodKey = strtolower(str_replace(' ', '', (string)($order['payment_method'] ?? '')));
+    $paymentCode = $paymentFields[$methodKey] ?? '31';
+    addCbcElement($doc, $paymentMeans, 'PaymentMeansCode', $paymentCode);
+    $invoice->appendChild($paymentMeans);
+
+    $itemsExcl = 0.0;
+    $itemsIncl = 0.0;
+    $lineIndex = 0;
+    foreach ($items as $item) {
+        $lineIndex++;
+        $quantity = max(1, (int)($item['quantity'] ?? 1));
+        $lineIncl = (float)($item['total_price'] ?? 0.0);
+        $lineExcl = $lineIncl / $vatFactor;
+        $lineTax = $lineIncl - $lineExcl;
+        $unitExcl = $quantity > 0 ? $lineExcl / $quantity : $lineExcl;
+        $description = $item['product_name'] ?? 'Product';
+
+        $invoice->appendChild(createInvoiceLine($doc, $lineIndex, $quantity, $lineExcl, $lineTax, $unitExcl, $description, $vatPercent));
+        $itemsExcl += $lineExcl;
+        $itemsIncl += $lineIncl;
+    }
+
+    if ($shippingIncl > 0) {
+        $lineIndex++;
+        $lineTax = $shippingIncl - $shippingExcl;
+        $invoice->appendChild(createInvoiceLine($doc, $lineIndex, 1, $shippingExcl, $lineTax, $shippingExcl, 'Verzendkosten', $vatPercent));
+        $itemsExcl += $shippingExcl;
+        $itemsIncl += $shippingIncl;
+    }
+
+    $totalExcl = $itemsExcl;
+    $totalIncl = $itemsIncl;
+    $invoiceTax = $totalIncl - $totalExcl;
+
+    $taxTotal = $doc->createElement('cac:TaxTotal');
+    addCbcElement($doc, $taxTotal, 'TaxAmount', formatXmlNumber($invoiceTax), ['currencyID' => 'EUR']);
+
+    $taxSubtotal = $doc->createElement('cac:TaxSubtotal');
+    addCbcElement($doc, $taxSubtotal, 'TaxableAmount', formatXmlNumber($totalExcl), ['currencyID' => 'EUR']);
+    addCbcElement($doc, $taxSubtotal, 'TaxAmount', formatXmlNumber($invoiceTax), ['currencyID' => 'EUR']);
+    $taxCategory = $doc->createElement('cac:TaxCategory');
+    addCbcElement($doc, $taxCategory, 'ID', 'S');
+    addCbcElement($doc, $taxCategory, 'Percent', (string)$vatPercent);
+    $taxSchemeTotal = $doc->createElement('cac:TaxScheme');
+    addCbcElement($doc, $taxSchemeTotal, 'ID', 'VAT');
+    $taxCategory->appendChild($taxSchemeTotal);
+    $taxSubtotal->appendChild($taxCategory);
+    $taxTotal->appendChild($taxSubtotal);
+    $invoice->appendChild($taxTotal);
+
+    $legalMonetary = $doc->createElement('cac:LegalMonetaryTotal');
+    addCbcElement($doc, $legalMonetary, 'LineExtensionAmount', formatXmlNumber($totalExcl), ['currencyID' => 'EUR']);
+    addCbcElement($doc, $legalMonetary, 'TaxExclusiveAmount', formatXmlNumber($totalExcl), ['currencyID' => 'EUR']);
+    addCbcElement($doc, $legalMonetary, 'TaxInclusiveAmount', formatXmlNumber($totalIncl), ['currencyID' => 'EUR']);
+    addCbcElement($doc, $legalMonetary, 'PayableAmount', formatXmlNumber($totalIncl), ['currencyID' => 'EUR']);
+    $invoice->appendChild($legalMonetary);
+
+    $paymentTerms = $doc->createElement('cac:PaymentTerms');
+    addCbcElement($doc, $paymentTerms, 'Note', 'Vervaldatum: ' . $dueDate);
+    addCbcElement($doc, $paymentTerms, 'PaymentDueDate', $dueDate);
+    $invoice->appendChild($paymentTerms);
+
+    return $doc->saveXML();
+}
+
+function createInvoiceLine(DOMDocument $doc, int $lineIndex, int $quantity, float $lineExcl, float $lineTax, float $unitExcl, string $description, float $vatPercent): DOMElement {
+    $line = $doc->createElement('cac:InvoiceLine');
+    addCbcElement($doc, $line, 'ID', (string)$lineIndex);
+    addCbcElement($doc, $line, 'InvoicedQuantity', (string)$quantity, ['unitCode' => 'EA']);
+    addCbcElement($doc, $line, 'LineExtensionAmount', formatXmlNumber($lineExcl), ['currencyID' => 'EUR']);
+
+    $lineTaxTotal = $doc->createElement('cac:TaxTotal');
+    addCbcElement($doc, $lineTaxTotal, 'TaxAmount', formatXmlNumber($lineTax), ['currencyID' => 'EUR']);
+    $taxSubtotal = $doc->createElement('cac:TaxSubtotal');
+    addCbcElement($doc, $taxSubtotal, 'TaxableAmount', formatXmlNumber($lineExcl), ['currencyID' => 'EUR']);
+    addCbcElement($doc, $taxSubtotal, 'TaxAmount', formatXmlNumber($lineTax), ['currencyID' => 'EUR']);
+    $taxCategory = $doc->createElement('cac:TaxCategory');
+    addCbcElement($doc, $taxCategory, 'ID', 'S');
+    addCbcElement($doc, $taxCategory, 'Percent', (string)$vatPercent);
+    $taxScheme = $doc->createElement('cac:TaxScheme');
+    addCbcElement($doc, $taxScheme, 'ID', 'VAT');
+    $taxCategory->appendChild($taxScheme);
+    $taxSubtotal->appendChild($taxCategory);
+    $lineTaxTotal->appendChild($taxSubtotal);
+    $line->appendChild($lineTaxTotal);
+
+    $item = $doc->createElement('cac:Item');
+    addCbcElement($doc, $item, 'Name', $description);
+    $line->appendChild($item);
+
+    $price = $doc->createElement('cac:Price');
+    addCbcElement($doc, $price, 'PriceAmount', formatXmlNumber($unitExcl), ['currencyID' => 'EUR']);
+    $line->appendChild($price);
+
+    return $line;
+}
+

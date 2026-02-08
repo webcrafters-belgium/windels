@@ -10,7 +10,7 @@ require_once $_SERVER['DOCUMENT_ROOT'] . '/lib/PHPMailer/Exception.php';
 
 require_once $_SERVER['DOCUMENT_ROOT'] . '/admin/pages/orders/_pdf_lib.php'; // nieuwe PDF library
 
-function sendAdminMail(int $orderId, float $totalPrice, float $shippingCost, ?string $pdfFactuurPath = null): void
+function sendAdminMail(int $orderId, float $totalPrice, float $shippingCost, ?string $pdfFactuurPath = null, ?string $xmlFactuurPath = null): void
 {
     global $conn, $smtp_host, $smtp_user, $smtp_pass;
 
@@ -28,12 +28,16 @@ function sendAdminMail(int $orderId, float $totalPrice, float $shippingCost, ?st
 
     $pdfFactuurPath = $pdfFactuurPath ?? $tempDir . "/factuur_{$orderId}.pdf";
     $pdfPakbonPath  = $tempDir . "/pakbon_{$orderId}.pdf";
+    $xmlFactuurPath = $xmlFactuurPath ?? $tempDir . "/factuur_{$orderId}.xml";
 
     // Maak PDF's via library-functies
     if (!file_exists($pdfFactuurPath)) {
         file_put_contents($pdfFactuurPath, buildInvoicePdfString($order, $items));
     }
     file_put_contents($pdfPakbonPath, buildPackingPdfString($order, $items));
+    if (!file_exists($xmlFactuurPath)) {
+        file_put_contents($xmlFactuurPath, buildInvoiceXmlString($order, $items));
+    }
 
     try {
         $mail = new PHPMailer(true);
@@ -65,6 +69,9 @@ function sendAdminMail(int $orderId, float $totalPrice, float $shippingCost, ?st
         // Voeg PDF's toe
         $mail->addAttachment($pdfFactuurPath, "Factuur_Order_{$orderId}.pdf");
         $mail->addAttachment($pdfPakbonPath, "Pakbon_Order_{$orderId}.pdf");
+        if (file_exists($xmlFactuurPath)) {
+            $mail->addAttachment($xmlFactuurPath, "Factuur_Order_{$orderId}.xml");
+        }
 
         $mail->send();
 
@@ -75,6 +82,9 @@ function sendAdminMail(int $orderId, float $totalPrice, float $shippingCost, ?st
         if (file_exists($pdfPakbonPath)) unlink($pdfPakbonPath);
         if (file_exists($pdfFactuurPath) && $pdfFactuurPath === ($tempDir . "/factuur_{$orderId}.pdf")) {
             unlink($pdfFactuurPath);
+        }
+        if (file_exists($xmlFactuurPath) && $xmlFactuurPath === ($tempDir . "/factuur_{$orderId}.xml")) {
+            unlink($xmlFactuurPath);
         }
     }
 }

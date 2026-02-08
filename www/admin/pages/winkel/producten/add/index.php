@@ -10,18 +10,41 @@ if ($res && $row = $res->fetch_assoc()) {
         $nextNumber = ((int)$row['sku']) + 1;
     }
 }
+
+$success = isset($_GET['success']) && $_GET['success'] === '1';
+$productId = isset($_GET['product_id']) ? (int)$_GET['product_id'] : null;
 ?>
 
 <div class="space-y-6">
+    <?php if ($success): ?>
+        <section class="card-glass p-4 border border-emerald-500/30 space-y-1">
+            <div class="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+                <div>
+                    <p class="text-sm font-semibold text-emerald-200">Product succesvol toegevoegd.</p>
+                    <?php if ($productId): ?>
+                        <p class="text-xs text-emerald-300 flex flex-wrap gap-1">
+                            ID <?= $productId ?>.
+                            <a href="/admin/pages/winkel/producten/edit_product.php?id=<?= $productId ?>" class="underline text-emerald-100 hover:text-white">Direct bewerken</a>
+                        </p>
+                    <?php endif; ?>
+                </div>
+                <div>
+                    <span class="px-3 py-1 rounded-full bg-emerald-500/20 text-emerald-100 text-xs font-semibold">
+                        <?= $productId ? "Nieuw ID: $productId" : 'Nieuwe invoer opgeslagen' ?>
+                    </span>
+                </div>
+            </div>
+        </section>
+    <?php endif; ?>
     <section class="card-glass p-6 shadow-xl">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
             <div>
-                <p class="text-xs uppercase tracking-widest text-teal-400 mb-2">Productbeheer</p>
-                <h1 class="text-3xl font-bold">Nieuw product toevoegen</h1>
-                <p class="text-sm text-gray-400">Alles wordt rechtstreeks opgeslagen in het productoverzicht. Vul extra specs in voor epoxy, terrazzo of kaarsen.</p>
+                <p class="text-xs uppercase tracking-widest text-teal-400 mb-2">Winkelbeheer</p>
+                <h1 class="text-3xl font-bold">Nieuw winkelproduct toevoegen</h1>
+                <p class="text-sm text-gray-400">Deze invoer gaat rechtstreeks naar de winkelcatalogus. Vul extra specs in voor epoxy, terrazzo of kaarsen.</p>
             </div>
             <div class="flex gap-3">
-                <a href="/admin/pages/products/index.php" class="px-4 py-2 rounded-xl border border-white/10 hover:border-white/30 transition">Terug naar producten</a>
+                <a href="/admin/pages/winkel/producten/index.php" class="px-4 py-2 rounded-xl border border-white/10 hover:border-white/30 transition">Terug naar de winkel</a>
                 <span class="px-4 py-2 rounded-xl bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">Volgende SKU: <?= $nextNumber ?></span>
             </div>
         </div>
@@ -147,7 +170,7 @@ if ($res && $row = $res->fetch_assoc()) {
 
             <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4 pt-4">
                 <button type="submit" class="px-6 py-3 rounded-xl bg-gradient-to-r from-teal-500 to-cyan-500 font-semibold text-white shadow-lg hover:opacity-90 transition">✓ Product invoegen</button>
-                <a href="/admin/pages/products/" class="px-6 py-3 rounded-xl border border-white/10 hover:border-white/30 transition text-sm">Annuleren</a>
+                <a href="/admin/pages/winkel/producten/" class="px-6 py-3 rounded-xl border border-white/10 hover:border-white/30 transition text-sm">Annuleren</a>
             </div>
         </form>
     </section>

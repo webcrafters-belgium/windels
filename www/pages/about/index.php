@@ -1,4 +1,9 @@
 <?php
+$pagetitle = 'Over Windels Green & Deco Resin - Ambacht en Creativiteit';
+$seoDescription = 'Leer over Andy Windels en het vakmanschap achter epoxy, terrazzo en natuurlijke materialen bij Windels Green & Deco Resin.';
+$seoImage = 'https://windelsgreen-decoresin.com/images/about/andy-windels.jpg';
+$ogType = 'AboutPage';
+
 include $_SERVER['DOCUMENT_ROOT'] . '/header.php';
 ?>
 

@@ -3,7 +3,7 @@
 global $conn;
 
 require $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
-session_start();
+//session_start();
 
 if (!isset($_SESSION['user']['role']) || $_SESSION['user']['role'] !== 'admin') {
     header("Location: /pages/account/login?referer=/admin/");

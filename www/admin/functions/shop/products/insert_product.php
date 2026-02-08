@@ -1,10 +1,40 @@
-# /admin/functions/shop/products/insert_product.php
+// FILE: /admin/pages/winkel/producten/add/save.php
 <?php
+function build_manual_image_path(string $directory, string $filename): ?string
+{
+    $directory = trim($directory);
+    $filename  = trim($filename);
+
+    if ($directory === '' && $filename === '') return null;
+
+    $directory = str_replace('\\', '/', $directory);
+    $filename  = str_replace('\\', '/', $filename);
+
+    // full path pasted into filename
+    if ($directory === '' && str_contains($filename, '/')) {
+        $directory = dirname($filename);
+        $filename  = basename($filename);
+    }
+
+    if ($directory === '' || $filename === '') return null;
+
+    if (str_contains($directory, '..') || str_contains($filename, '..')) return null;
+
+    // Strip query/fragment
+    $filename = preg_replace('/[?#].*$/', '', $filename);
+
+    $directory = '/' . trim(preg_replace('#/+#', '/', $directory), '/');
+    $filename  = basename($filename);
+
+    if ($filename === '' || $filename === '.' || $filename === '..') return null;
+
+    return $directory === '/' ? '/' . $filename : $directory . '/' . $filename;
+}
+
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
 include($_SERVER['DOCUMENT_ROOT'] . '/ini.inc');
-require_once __DIR__ . '/parent_column.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -21,29 +51,25 @@ $slug               = trim($_POST['slug'] ?? '');
 $description        = trim($_POST['description'] ?? '');
 $short_description  = trim($_POST['short_description'] ?? '');
 $type               = trim($_POST['type'] ?? 'simple');
+$product_type       = trim($_POST['product_type'] ?? '');
 $stock              = (int)($_POST['stock_quantity'] ?? 0);
 $stock_status       = trim($_POST['stock_status'] ?? 'instock');
 $price              = trim($_POST['price'] ?? '0.00');
 $regular_price      = trim($_POST['regular_price'] ?? $price);
 $sale_price_raw     = trim($_POST['sale_price'] ?? '');
-$parent_id_raw      = $_POST['parent_id'] ?? ''; // kan leeg zijn
+$weight_grams_raw   = trim($_POST['weight_grams'] ?? '');
 $created_at         = date('Y-m-d H:i:s');
 $updated_at         = $created_at;
 
-$amount_grams       = trim($_POST['amount_grams'] ?? '');
-$paraffin_percentage = trim($_POST['paraffin_percentage'] ?? '');
-$stearin_percentage  = trim($_POST['stearin_percentage'] ?? '');
+// Handmatige afbeelding-optie
+$manual_image_path  = trim($_POST['manual_image_path'] ?? '');
+$manual_image_name  = trim($_POST['manual_image_name'] ?? '');
 
 // Sale price naar NULL indien leeg
 $sale_price = ($sale_price_raw === '' ? null : $sale_price_raw);
 
-// Parent-id casten of NULL
-$parent_id = ($parent_id_raw === '' || $parent_id_raw === null) ? null : (int)$parent_id_raw;
-
-$parentColumnAvailable = ensureProductParentColumn($conn);
-if (!$parentColumnAvailable) {
-    $parent_id = null;
-}
+// Weight naar NULL indien leeg
+$weight_grams = ($weight_grams_raw === '' ? null : $weight_grams_raw);
 
 // --- Validatie ---
 if (!preg_match('/^\d+-\d+$/', $sku)) {
@@ -64,27 +90,8 @@ if ($regular_price !== '' && !preg_match('/^\d+(\.\d{1,2})?$/', $regular_price))
 if ($sale_price !== null && $sale_price !== '' && !preg_match('/^\d+(\.\d{1,2})?$/', $sale_price)) {
     $errors[] = "❌ Actieprijs heeft een ongeldig formaat.";
 }
-
-foreach ([
-    'amount_grams' => $amount_grams,
-    'paraffin_percentage' => $paraffin_percentage,
-    'stearin_percentage' => $stearin_percentage
-] as $field => $value) {
-    if ($value !== '' && !is_numeric($value)) {
-        $errors[] = "❌ {$field} moet een getal zijn (laat leeg als niet van toepassing).";
-    }
-}
-
-// Als parent is opgegeven: moet bestaan en zelf géén parent hebben (top-level)
-if ($parentColumnAvailable && $parent_id !== null) {
-    $stmt_p = $conn->prepare("SELECT id FROM products WHERE id = ? AND parent_id IS NULL LIMIT 1");
-    $stmt_p->bind_param("i", $parent_id);
-    $stmt_p->execute();
-    $stmt_p->store_result();
-    if ($stmt_p->num_rows === 0) {
-        $errors[] = "❌ Ongeldige parent geselecteerd (bestaat niet of is zelf een variant).";
-    }
-    $stmt_p->close();
+if ($weight_grams !== null && $weight_grams !== '' && !is_numeric($weight_grams)) {
+    $errors[] = "❌ weight_grams moet een getal zijn (laat leeg als niet van toepassing).";
 }
 
 if (!empty($errors)) {
@@ -105,96 +112,29 @@ if ($stmt_check->num_rows > 0) {
 }
 $stmt_check->close();
 
-// Begin transactie
 $conn->begin_transaction();
 
 try {
-    // Product inserten (met parent_id)
-    // Let op: sale_price kan NULL zijn → we binden als string en zetten via conditional set_null
-    $base_columns = [
-        'name', 'slug', 'sku', 'type',
-        'description', 'short_description',
-        'price', 'regular_price', 'sale_price',
-        'stock_quantity', 'stock_status'
-    ];
-
-    $base_values = [
-        $name,
-        $slug,
-        $sku,
-        $type,
-        $description,
-        $short_description,
-        $price,
-        $regular_price,
-        $sale_price,
-        $stock,
-        $stock_status,
-    ];
-
-    $base_types = 'sssssssssiss';
-
-    $all_columns = $base_columns;
-    $all_values = $base_values;
-    $all_types = $base_types;
-
-    if ($parentColumnAvailable) {
-        $all_columns[] = 'parent_id';
-        $all_values[] = $parent_id;
-        $all_types .= 'i';
-    }
-
-    $all_columns[] = 'created_at';
-    $all_values[] = $created_at;
-    $all_columns[] = 'updated_at';
-    $all_values[] = $updated_at;
-    $all_types .= 'ss';
-
-    $optional_definitions = [
-        'amount_grams' => $amount_grams,
-        'paraffin_percentage' => $paraffin_percentage,
-        'stearin_percentage' => $stearin_percentage,
-    ];
-
-    $optional_columns = [];
-    foreach ($optional_definitions as $column => $value) {
-        $stmt_col = $conn->prepare("SHOW COLUMNS FROM products LIKE ?");
-        $stmt_col->bind_param("s", $column);
-        $stmt_col->execute();
-        $stmt_col->store_result();
-        if ($stmt_col->num_rows > 0) {
-            $optional_columns[$column] = ($value === '' ? null : $value);
-        }
-        $stmt_col->free_result();
-        $stmt_col->close();
-    }
-
-    foreach ($optional_columns as $column => $value) {
-        $all_columns[] = $column;
-        $all_values[] = $value;
-        $all_types .= 's';
-    }
-
-    $placeholders = implode(', ', array_fill(0, count($all_columns), '?'));
-    $sql = sprintf(
-        "INSERT INTO products (%s) VALUES (%s)",
-        implode(', ', $all_columns),
-        $placeholders
-    );
+    // ✅ EXACT jouw kolommen
+    $sql = "
+        INSERT INTO products
+        (name, slug, sku, type, product_type, description, short_description, price, regular_price, sale_price,
+         weight_grams, stock_quantity, stock_status, created_at, updated_at)
+        VALUES
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?,
+         ?, ?, ?, ?, ?)
+    ";
     $stmt = $conn->prepare($sql);
     if (!$stmt) {
         throw new Exception("Fout bij voorbereiden product insert: " . $conn->error);
     }
 
-    $params = array_merge([$all_types], $all_values);
-    $refs = [];
-    foreach ($params as $key => $value) {
-        $refs[$key] = &$params[$key];
-    }
-
-    if (!call_user_func_array([$stmt, 'bind_param'], $refs)) {
-        throw new Exception("Fout bij binden productwaarden: " . $stmt->error);
-    }
+    // types: 10x s (t/m sale_price) + s(weight) + i(stock) + s(status) + s + s
+    $stmt->bind_param(
+            "sssssssssssisss",
+            $name, $slug, $sku, $type, $product_type, $description, $short_description, $price, $regular_price, $sale_price,
+            $weight_grams, $stock, $stock_status, $created_at, $updated_at
+    );
 
     if (!$stmt->execute()) {
         throw new Exception("Fout bij toevoegen product: " . $stmt->error);
@@ -225,6 +165,8 @@ try {
         $stmt_link->close();
     }
     $stmt_sub->close();
+
+    $image_saved = false;
 
     // Afbeelding upload (optioneel)
     if (isset($_FILES['product_image']) && $_FILES['product_image']['error'] !== UPLOAD_ERR_NO_FILE) {
@@ -283,12 +225,26 @@ try {
             throw new Exception("Fout bij opslaan productafbeelding: " . $stmt_img->error);
         }
         $stmt_img->close();
+        $image_saved = true;
     }
 
-    // Commit
+    // Manual image fallback
+    $manualImagePath = build_manual_image_path($manual_image_path, $manual_image_name);
+    if (!$image_saved && $manualImagePath) {
+        $stmt_img = $conn->prepare("
+            INSERT INTO product_images (product_id, sku, image_path, is_main)
+            VALUES (?, ?, ?, 1)
+        ");
+        $stmt_img->bind_param("iss", $product_id, $sku, $manualImagePath);
+        if (!$stmt_img->execute()) {
+            throw new Exception("Fout bij opslaan productafbeelding: " . $stmt_img->error);
+        }
+        $stmt_img->close();
+        $image_saved = true;
+    }
+
     $conn->commit();
 
-    // ✅ Redirect met succesmelding
     header("Location: /admin/pages/winkel/producten/add/index.php?product_id=$product_id&success=1");
     exit;
 

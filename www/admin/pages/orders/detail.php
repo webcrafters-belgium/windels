@@ -50,9 +50,12 @@ $config = $statusConfig[$order['status']] ?? $statusConfig['pending'];
                 <span><?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></span>
             </p>
         </div>
-        <div class="flex gap-3">
+        <div class="flex gap-3 flex-wrap">
             <a href="/admin/pages/orders/pdf_invoice.php?id=<?= $order['id'] ?>" target="_blank" class="glass px-4 py-2 rounded-xl font-semibold hover:bg-white/10 transition flex items-center gap-2">
                 <i class="bi bi-file-earmark-pdf"></i>PDF Factuur
+            </a>
+            <a href="/admin/pages/orders/xml_invoice.php?id=<?= $order['id'] ?>" target="_blank" class="glass px-4 py-2 rounded-xl font-semibold hover:bg-white/10 transition flex items-center gap-2">
+                <i class="bi bi-code-slash"></i>XML Factuur
             </a>
             <a href="/pages/orders/index.php" class="glass px-4 py-2 rounded-xl font-semibold hover:bg-white/10 transition flex items-center gap-2">
                 <i class="bi bi-arrow-left"></i>Terug
