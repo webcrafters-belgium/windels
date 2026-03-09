@@ -70,7 +70,8 @@ $couponDiscount = 0.0;
 if (!empty($_SESSION['applied_coupon'])
     && isset($_SESSION['applied_coupon']['discount'], $_SESSION['applied_coupon']['discount_type'])) {
     $discountValue = (float)$_SESSION['applied_coupon']['discount'];
-    $discountType  = $_SESSION['applied_coupon']['discount_type'];
+    $rawType = strtolower((string)$_SESSION['applied_coupon']['discount_type']);
+    $discountType = in_array($rawType, ['percent', 'percentage'], true) ? 'percent' : 'amount';
     if ($discountType==='percent') $couponDiscount = $totalProducts * ($discountValue/100);
     if ($discountType==='amount')  $couponDiscount = min($discountValue, $totalProducts);
 }
