@@ -1,14 +1,30 @@
-<?php
+﻿<?php
 session_start();
 include $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
 include $_SERVER['DOCUMENT_ROOT'] . '/API/mail/mail_config.php';
 
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
-    echo json_encode(["success" => false, "message" => "Ongeldige aanvraag."]);
+    echo json_encode(['success' => false, 'message' => 'Ongeldige aanvraag.']);
     exit;
 }
 
-// ✅ Formulierdata ophalen
+// Honeypot anti-spam checks
+$honeypots = ['website', 'url', 'company', 'fax'];
+foreach ($honeypots as $hp) {
+    if (!empty($_POST[$hp])) {
+        echo json_encode(['success' => false, 'message' => 'Registratie niet toegestaan.']);
+        exit;
+    }
+}
+
+// Time-based honeypot: te snelle submit = verdacht
+$formTime = (int)($_POST['form_time'] ?? 0);
+if ($formTime === 0 || (time() - $formTime) < 3) {
+    echo json_encode(['success' => false, 'message' => 'Registratie niet toegestaan.']);
+    exit;
+}
+
+// Formulierdata ophalen
 $username = trim($_POST['username'] ?? '');
 $email = trim($_POST['email'] ?? '');
 $password = $_POST['password'] ?? '';
@@ -21,64 +37,63 @@ $zipcode = trim($_POST['zipcode'] ?? '');
 $city = trim($_POST['city'] ?? '');
 $country = trim($_POST['country'] ?? '');
 
-// ✅ Basisvalidaties
+// Basisvalidaties
 if (empty($username) || empty($email) || empty($password) || empty($confirm_password) ||
     empty($first_name) || empty($last_name) || empty($address) || empty($zipcode) || empty($city) || empty($country)) {
-    echo json_encode(["success" => false, "message" => "Vul alle verplichte velden in."]);
+    echo json_encode(['success' => false, 'message' => 'Vul alle verplichte velden in.']);
     exit;
 }
 
 if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-    echo json_encode(["success" => false, "message" => "Ongeldig e-mailadres."]);
+    echo json_encode(['success' => false, 'message' => 'Ongeldig e-mailadres.']);
     exit;
 }
 
 if ($password !== $confirm_password) {
-    echo json_encode(["success" => false, "message" => "Wachtwoorden komen niet overeen."]);
+    echo json_encode(['success' => false, 'message' => 'Wachtwoorden komen niet overeen.']);
     exit;
 }
 
-// ✅ Hash wachtwoord en genereer een verificatie-token
+// Hash wachtwoord en genereer een verificatie-token
 $hashed_password = password_hash($password, PASSWORD_BCRYPT);
-$confirmation_token = bin2hex(random_bytes(32)); // 64-karakter lange token
+$confirmation_token = bin2hex(random_bytes(32));
 
-// ✅ Controleer of e-mail al bestaat
-$query = $conn->prepare("SELECT id FROM users WHERE email = ?");
-$query->bind_param("s", $email);
+// Controleer of e-mail al bestaat
+$query = $conn->prepare('SELECT id FROM users WHERE email = ?');
+$query->bind_param('s', $email);
 $query->execute();
 $query->store_result();
 
 if ($query->num_rows > 0) {
-    echo json_encode(["success" => false, "message" => "E-mailadres is al geregistreerd."]);
+    echo json_encode(['success' => false, 'message' => 'E-mailadres is al geregistreerd.']);
     exit;
 }
 $query->close();
 
-// ✅ Voeg gebruiker toe in `users`-tabel
-$query = $conn->prepare("INSERT INTO users (username, email, password, first_name, last_name, phone, confirmation_token, is_confirmed) 
-                         VALUES (?, ?, ?, ?, ?, ?, ?, 0)");
-$query->bind_param("sssssss", $username, $email, $hashed_password, $first_name, $last_name, $phone, $confirmation_token);
+// Voeg gebruiker toe in users
+$query = $conn->prepare('INSERT INTO users (username, email, password, first_name, last_name, phone, confirmation_token, is_confirmed) VALUES (?, ?, ?, ?, ?, ?, ?, 0)');
+$query->bind_param('sssssss', $username, $email, $hashed_password, $first_name, $last_name, $phone, $confirmation_token);
 
 if (!$query->execute()) {
-    error_log("❌ Fout bij registreren: " . $query->error);
-    echo json_encode(["success" => false, "message" => "Registratie mislukt."]);
+    error_log('Fout bij registreren: ' . $query->error);
+    echo json_encode(['success' => false, 'message' => 'Registratie mislukt.']);
     exit;
 }
 
 $user_id = $query->insert_id;
 $query->close();
 
-// ✅ Voeg adres toe aan `addresses`-tabel
+// Voeg adres toe
 $query = $conn->prepare("INSERT INTO addresses (user_id, address, city, zipcode, country, type) VALUES (?, ?, ?, ?, ?, 'shipping')");
-$query->bind_param("issss", $user_id, $address, $city, $zipcode, $country);
+$query->bind_param('issss', $user_id, $address, $city, $zipcode, $country);
 
 if (!$query->execute()) {
-    error_log("❌ Fout bij adres opslaan: " . $query->error);
+    error_log('Fout bij adres opslaan: ' . $query->error);
 }
 $query->close();
 
-// ✅ Stuur verificatie-e-mail
-$subject = "Bevestig je registratie bij Windels";
+// Stuur verificatie-e-mail
+$subject = 'Bevestig je registratie bij Windels';
 $body = "
     <h1>Welkom bij Windels, $username!</h1>
     <p>Bedankt voor je registratie. Klik op de link hieronder om je e-mailadres te bevestigen:</p>
@@ -87,9 +102,9 @@ $body = "
 ";
 
 if (sendMail($email, $subject, $body)) {
-    echo json_encode(["success" => true, "message" => "Registratie geslaagd! Controleer je e-mail voor bevestiging."]);
+    echo json_encode(['success' => true, 'message' => 'Registratie geslaagd! Controleer je e-mail voor bevestiging.']);
 } else {
-    echo json_encode(["success" => false, "message" => "Registratie geslaagd, maar e-mail kon niet worden verzonden."]);
+    echo json_encode(['success' => false, 'message' => 'Registratie geslaagd, maar e-mail kon niet worden verzonden.']);
 }
 
 $conn->close();

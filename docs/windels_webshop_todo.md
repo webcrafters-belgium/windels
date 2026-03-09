@@ -176,3 +176,4 @@ panel should be technically stable and production‑ready.
 - Gewijzigd in `www/functions/shop/cart/apply_coupon.php`, `www/functions/shop/cart/checkout.php`, `www/pages/shop/cart/index.php`, `www/js/checkout.js`.
 - Admin couponbeheer is bewust nog niet aangepast (volgens prioriteit: eerst www).
 - 2026-03-09 (www): Logout-flow hersteld (session cookie + session destroy + redirect naar /pages/account/login/), inclusief compat-route `/pages/account/logout.php`.
+- 2026-03-09 (www): Anti-spam honeypot ook toegevoegd aan `www/API/auth/register.php` (extra bescherming voor alternatieve registratie-endpoint).
