@@ -8,7 +8,7 @@ if (!isset($_POST['order_id']) || !isset($_POST['status'])) {
 
 $order_id = (int)$_POST['order_id'];
 $status = $_POST['status'];
-$toegestane_statussen = ['pending', 'paid', 'shipped', 'cancelled'];
+$toegestane_statussen = ['pending', 'paid', 'shipped', 'completed', 'cancelled'];
 
 if (!in_array($status, $toegestane_statussen)) {
     die('Ongeldige status.');

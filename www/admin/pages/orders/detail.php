@@ -31,7 +31,26 @@ $statusConfig = [
     'pending' => ['bg' => 'bg-amber-500/20', 'text' => 'text-amber-400', 'border' => 'border-amber-500/30', 'icon' => 'bi-hourglass-split'],
     'paid' => ['bg' => 'bg-emerald-500/20', 'text' => 'text-emerald-400', 'border' => 'border-emerald-500/30', 'icon' => 'bi-check-circle-fill'],
     'shipped' => ['bg' => 'bg-blue-500/20', 'text' => 'text-blue-400', 'border' => 'border-blue-500/30', 'icon' => 'bi-truck'],
+    'completed' => ['bg' => 'bg-green-500/20', 'text' => 'text-green-400', 'border' => 'border-green-500/30', 'icon' => 'bi-check2-all'],
     'cancelled' => ['bg' => 'bg-rose-500/20', 'text' => 'text-rose-400', 'border' => 'border-rose-500/30', 'icon' => 'bi-x-circle-fill'],
+    // Legacy NL statuses
+    'in behandeling' => ['bg' => 'bg-amber-500/20', 'text' => 'text-amber-400', 'border' => 'border-amber-500/30', 'icon' => 'bi-hourglass-split'],
+    'betaald' => ['bg' => 'bg-emerald-500/20', 'text' => 'text-emerald-400', 'border' => 'border-emerald-500/30', 'icon' => 'bi-check-circle-fill'],
+    'verzonden' => ['bg' => 'bg-blue-500/20', 'text' => 'text-blue-400', 'border' => 'border-blue-500/30', 'icon' => 'bi-truck'],
+    'afgerond' => ['bg' => 'bg-green-500/20', 'text' => 'text-green-400', 'border' => 'border-green-500/30', 'icon' => 'bi-check2-all'],
+    'geannuleerd' => ['bg' => 'bg-rose-500/20', 'text' => 'text-rose-400', 'border' => 'border-rose-500/30', 'icon' => 'bi-x-circle-fill'],
+];
+$statusLabels = [
+    'pending' => 'In afwachting',
+    'paid' => 'Betaald',
+    'shipped' => 'Verzonden',
+    'completed' => 'Afgerond',
+    'cancelled' => 'Geannuleerd',
+    'in behandeling' => 'In behandeling',
+    'betaald' => 'Betaald',
+    'verzonden' => 'Verzonden',
+    'afgerond' => 'Afgerond',
+    'geannuleerd' => 'Geannuleerd',
 ];
 $config = $statusConfig[$order['status']] ?? $statusConfig['pending'];
 ?>
@@ -45,7 +64,7 @@ $config = $statusConfig[$order['status']] ?? $statusConfig['pending'];
             </h1>
             <p class="text-lg flex items-center gap-3" style="color: var(--text-muted);">
                 <span class="px-3 py-1.5 rounded-lg text-sm font-semibold border <?= $config['bg'] ?> <?= $config['text'] ?> <?= $config['border'] ?>">
-                    <i class="bi <?= $config['icon'] ?> mr-1"></i><?= ucfirst($order['status'] ?? 'pending') ?>
+                    <i class="bi <?= $config['icon'] ?> mr-1"></i><?= htmlspecialchars($statusLabels[$order['status']] ?? (string)$order['status']) ?>
                 </span>
                 <span><?= date('d/m/Y H:i', strtotime($order['created_at'])) ?></span>
             </p>
@@ -57,7 +76,7 @@ $config = $statusConfig[$order['status']] ?? $statusConfig['pending'];
             <a href="/admin/pages/orders/xml_invoice.php?id=<?= $order['id'] ?>" target="_blank" class="glass px-4 py-2 rounded-xl font-semibold hover:bg-white/10 transition flex items-center gap-2">
                 <i class="bi bi-code-slash"></i>XML Factuur
             </a>
-            <a href="/pages/orders/index.php" class="glass px-4 py-2 rounded-xl font-semibold hover:bg-white/10 transition flex items-center gap-2">
+            <a href="/admin/pages/orders/index.php" class="glass px-4 py-2 rounded-xl font-semibold hover:bg-white/10 transition flex items-center gap-2">
                 <i class="bi bi-arrow-left"></i>Terug
             </a>
         </div>
@@ -78,6 +97,7 @@ $config = $statusConfig[$order['status']] ?? $statusConfig['pending'];
                     <option value="pending" <?= $order['status'] == 'pending' ? 'selected' : '' ?>>In afwachting</option>
                     <option value="paid" <?= $order['status'] == 'paid' ? 'selected' : '' ?>>Betaald</option>
                     <option value="shipped" <?= $order['status'] == 'shipped' ? 'selected' : '' ?>>Verzonden</option>
+                    <option value="completed" <?= $order['status'] == 'completed' ? 'selected' : '' ?>>Afgerond</option>
                     <option value="cancelled" <?= $order['status'] == 'cancelled' ? 'selected' : '' ?>>Geannuleerd</option>
                 </select>
                 <button type="submit" class="accent-bg text-white px-6 py-2 rounded-xl font-semibold hover:opacity-90 transition">

@@ -184,3 +184,5 @@ panel should be technically stable and production‑ready.
 - Root-cause: navigatie verwees naar niet-bestaande settings pagina onder `/admin/pages/settings/` terwijl werkende module onder `/admin/config/` staat.
 - 2026-03-09 (admin): Blog image upload hersteld door add/edit uploadpad te aligneren op `/images/uploads/blog/`.
 - 2026-03-09 (admin): Uploadflow verhard met map-write checks (`is_writable`) en upload-validatie (`is_uploaded_file`).
+- 2026-03-09 (admin): Nieuwe orderstatus toegevoegd: `completed` (label: Afgerond) in update logic + admin orderlijsten/detail/edit.
+- 2026-03-09 (admin): Orderstatus UI geharmoniseerd naar `pending/paid/shipped/completed/cancelled` met backward-compat labels voor bestaande NL statussen.

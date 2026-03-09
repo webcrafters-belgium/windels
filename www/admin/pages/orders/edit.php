@@ -82,9 +82,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                 <div class="flex flex-col">
                     <label class="text-sm font-semibold mb-2" style="color: var(--text-secondary);">Status</label>
                     <select name="status" class="w-full px-4 py-3 rounded-xl glass border" style="border-color: var(--border-glass);">
-                        <?php foreach (["in behandeling", "betaald", "verzonden", "geannuleerd"] as $opt): ?>
-                            <option value="<?= $opt ?>" <?= $order['status'] === $opt ? 'selected' : '' ?>><?= ucfirst($opt) ?></option>
-                        <?php endforeach; ?>
+                        <option value="pending" <?= $order['status'] === 'pending' ? 'selected' : '' ?>>In afwachting</option>
+                        <option value="paid" <?= $order['status'] === 'paid' ? 'selected' : '' ?>>Betaald</option>
+                        <option value="shipped" <?= $order['status'] === 'shipped' ? 'selected' : '' ?>>Verzonden</option>
+                        <option value="completed" <?= $order['status'] === 'completed' ? 'selected' : '' ?>>Afgerond</option>
+                        <option value="cancelled" <?= $order['status'] === 'cancelled' ? 'selected' : '' ?>>Geannuleerd</option>
                     </select>
                 </div>
 
