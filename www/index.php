@@ -10,6 +10,8 @@ $pagetitle = "Windels Green & Deco Resin | Epoxy, Terrazzo & Kaarsen";
 $seoDescription = "Ontdek bij Windels unieke epoxy, terrazzo en kaarsen die lokaal handgemaakt en duurzaam afgewerkt zijn.";
 $seoImage = "https://windelsgreen-decoresin.com/images/layout/new_index/eco-resin-mini-tray-terrazzo-craft-workshop-edinburgh-portrait-big.png";
 $products = getRandomProducts($conn, 20);
+$newProducts = getNewestProducts($conn, 8);
+$saleProducts = getSaleProducts($conn, 8);
 
 include $_SERVER['DOCUMENT_ROOT'] . '/header.php';
 ?>
@@ -141,7 +143,15 @@ include $_SERVER['DOCUMENT_ROOT'] . '/header.php';
             <?php foreach ($products as $product): ?>
                 <div class="product-item">
 
-                    <div class="product-image-wrapper">
+                    <div class="product-image-wrapper position-relative">
+                        <?php
+                        $tagBadge = resolveProductTagBadge($product['tag'] ?? null);
+                        ?>
+                        <?php if ($tagBadge): ?>
+                            <span class="badge <?= htmlspecialchars($tagBadge['class']) ?> position-absolute m-2">
+                                <?= htmlspecialchars($tagBadge['label']) ?>
+                            </span>
+                        <?php endif; ?>
                         <img loading="lazy"
                              src="<?= htmlspecialchars($product['product_image']); ?>"
                              alt="<?= htmlspecialchars($product['name'] ?? 'Product'); ?>">
@@ -177,6 +187,108 @@ include $_SERVER['DOCUMENT_ROOT'] . '/header.php';
 
     </div>
 </section>
+
+<!-- NIEUWE PRODUCTEN -->
+<section class="py-5 product-grid-section">
+    <div class="container-fluid">
+        <div class="home-section-header d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="home-section-title">Nieuwe producten</h2>
+                <p class="home-section-subtitle">Onze recentste toevoegingen aan het assortiment.</p>
+            </div>
+            <a href="/pages/shop/" class="home-section-link">Bekijk alle producten →</a>
+        </div>
+
+        <div class="masonry-grid">
+            <?php foreach ($newProducts as $product): ?>
+                <div class="product-item">
+                    <div class="product-image-wrapper position-relative">
+                        <?php $tagBadge = resolveProductTagBadge($product['tag'] ?? null); ?>
+                        <?php if ($tagBadge): ?>
+                            <span class="badge <?= htmlspecialchars($tagBadge['class']) ?> position-absolute m-2">
+                                <?= htmlspecialchars($tagBadge['label']) ?>
+                            </span>
+                        <?php endif; ?>
+                        <img loading="lazy"
+                             src="<?= htmlspecialchars($product['product_image']); ?>"
+                             alt="<?= htmlspecialchars($product['name'] ?? 'Product'); ?>">
+                    </div>
+
+                    <div class="product-item-content">
+                        <div>
+                            <h3 class="product-title mb-1"><?= htmlspecialchars($product['name'] ?? 'Product'); ?></h3>
+                            <div class="product-price fw-bold">€<?= number_format((float)$product['price'], 2, ',', '.'); ?></div>
+                        </div>
+
+                        <?php if ($product['stock_status'] === 'instock' && (int)$product['stock_quantity'] > 0): ?>
+                            <button class="btn btn-primary w-100 mt-3 add-to-cart"
+                                    data-id="<?= (int)$product['id']; ?>"
+                                    data-qty="1"
+                                    data-price="<?= (int)round($product['price'] * 100); ?>"
+                                    data-name="<?= htmlspecialchars($product['name']); ?>">
+                                🛒 Toevoegen aan winkelwagen
+                            </button>
+                        <?php else: ?>
+                            <span class="text-danger fw-bold mt-3">Uitverkocht</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+
+<!-- ACTIE PRODUCTEN -->
+<?php if (!empty($saleProducts)): ?>
+<section class="py-5 product-grid-section">
+    <div class="container-fluid">
+        <div class="home-section-header d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2 class="home-section-title">Actie producten</h2>
+                <p class="home-section-subtitle">Producten die momenteel in actie staan.</p>
+            </div>
+            <a href="/pages/shop/" class="home-section-link">Bekijk alle producten →</a>
+        </div>
+
+        <div class="masonry-grid">
+            <?php foreach ($saleProducts as $product): ?>
+                <div class="product-item">
+                    <div class="product-image-wrapper position-relative">
+                        <?php $tagBadge = resolveProductTagBadge($product['tag'] ?? null); ?>
+                        <?php if ($tagBadge): ?>
+                            <span class="badge <?= htmlspecialchars($tagBadge['class']) ?> position-absolute m-2">
+                                <?= htmlspecialchars($tagBadge['label']) ?>
+                            </span>
+                        <?php endif; ?>
+                        <img loading="lazy"
+                             src="<?= htmlspecialchars($product['product_image']); ?>"
+                             alt="<?= htmlspecialchars($product['name'] ?? 'Product'); ?>">
+                    </div>
+
+                    <div class="product-item-content">
+                        <div>
+                            <h3 class="product-title mb-1"><?= htmlspecialchars($product['name'] ?? 'Product'); ?></h3>
+                            <div class="product-price fw-bold">€<?= number_format((float)$product['price'], 2, ',', '.'); ?></div>
+                        </div>
+
+                        <?php if ($product['stock_status'] === 'instock' && (int)$product['stock_quantity'] > 0): ?>
+                            <button class="btn btn-primary w-100 mt-3 add-to-cart"
+                                    data-id="<?= (int)$product['id']; ?>"
+                                    data-qty="1"
+                                    data-price="<?= (int)round($product['price'] * 100); ?>"
+                                    data-name="<?= htmlspecialchars($product['name']); ?>">
+                                🛒 Toevoegen aan winkelwagen
+                            </button>
+                        <?php else: ?>
+                            <span class="text-danger fw-bold mt-3">Uitverkocht</span>
+                        <?php endif; ?>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
+<?php endif; ?>
 
 
 

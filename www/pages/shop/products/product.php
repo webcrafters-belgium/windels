@@ -1,5 +1,6 @@
 <?php
 require_once $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
+require_once $_SERVER['DOCUMENT_ROOT'] . '/functions/helpers/shop_helpers.php';
 include $_SERVER['DOCUMENT_ROOT'] . '/header.php';
 
 if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
@@ -7,6 +8,13 @@ if (!isset($_GET['id']) || !is_numeric($_GET['id'])) {
 }
 
 $product_id = intval($_GET['id']);
+
+$hasTagColumn = false;
+$tagColumnCheck = $conn->query("SHOW COLUMNS FROM products LIKE 'tag'");
+if ($tagColumnCheck && $tagColumnCheck->num_rows > 0) {
+    $hasTagColumn = true;
+}
+$tagSelect = $hasTagColumn ? 'p.tag' : 'NULL AS tag';
 
 // 🛒 Product ophalen
 $productQuery = "
@@ -17,6 +25,7 @@ $productQuery = "
         p.price, 
         p.stock_quantity,
         p.sku,
+        {$tagSelect},
         c.slug AS categorie_slug,
         c.id   AS categorie_id
     FROM 
@@ -45,6 +54,7 @@ $cat_id   = $product['categorie_id'] ?? null;
 $product_stock = $product['stock_quantity'];
 $original_price = (float)$product['price'];
 $vers_product = ($cat_id == 5);
+$tagBadge = resolveProductTagBadge($product['tag'] ?? null);
 
 // ===== PRIJSBEREKENING =====
 $today = date('Y-m-d');
@@ -177,6 +187,13 @@ $imgStmt->close();
                     </a>
                 </div>
             <?php else: ?>
+                <?php if ($tagBadge): ?>
+                    <p class="mb-2">
+                        <span class="badge <?= htmlspecialchars($tagBadge['class']) ?> fs-6 px-3 py-2">
+                            <?= htmlspecialchars($tagBadge['label']) ?>
+                        </span>
+                    </p>
+                <?php endif; ?>
                 <?php if ($discount > 0): ?>
                     <p class="mb-2">
                         <span class="badge <?= $badgeClass ?> fs-6 px-3 py-2"><?= $priceLabel ?></span>

@@ -11,6 +11,7 @@ include $_SERVER['DOCUMENT_ROOT'] . '/header.php';
 include $_SERVER['DOCUMENT_ROOT'] . '/functions/helpers/product_filters.php';
 include $_SERVER['DOCUMENT_ROOT'] . '/functions/helpers/category_helpers.php';
 include $_SERVER['DOCUMENT_ROOT'] . '/functions/helpers/text_helpers.php';
+include $_SERVER['DOCUMENT_ROOT'] . '/functions/helpers/shop_helpers.php';
 
 // ✅ Filters ophalen
 $searchTerm = $_GET['search'] ?? '';
@@ -152,6 +153,24 @@ $promoStmt = $conn->prepare("
         color: #fff;
         box-shadow: 0 10px 22px rgba(0,0,0,.18);
     }
+    .product-badges {
+        position: absolute;
+        top: 12px;
+        left: 12px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+        z-index: 2;
+    }
+    .product-badge {
+        display: inline-block;
+        padding: 6px 10px;
+        border-radius: 999px;
+        font-weight: 700;
+        font-size: .82rem;
+        color: #fff;
+        box-shadow: 0 10px 22px rgba(0,0,0,.18);
+    }
     .bg-red { background: #dc3545; }
     .bg-orange { background: #fd7e14; }
     .bg-green { background: #198754; }
@@ -270,6 +289,7 @@ $promoStmt = $conn->prepare("
 
                             $discountedPrice = null;
                             $badgeClass = null;
+                            $tagBadge = resolveProductTagBadge($product['tag'] ?? null);
 
                             if ($promo) {
                                 $discount = (int)$promo['discount_percentage'];
@@ -289,10 +309,19 @@ $promoStmt = $conn->prepare("
                             <div class="product-card position-relative">
 
                                 <div class="product-media">
-                                    <?php if ($promo): ?>
-                                        <span class="promo-badge <?= $badgeClass ?>">
-                                            -<?= (int)$discount ?>%
-                                        </span>
+                                    <?php if ($promo || $tagBadge): ?>
+                                        <div class="product-badges">
+                                            <?php if ($promo): ?>
+                                                <span class="promo-badge <?= $badgeClass ?>">
+                                                    -<?= (int)$discount ?>%
+                                                </span>
+                                            <?php endif; ?>
+                                            <?php if ($tagBadge): ?>
+                                                <span class="product-badge <?= htmlspecialchars($tagBadge['class']) ?>">
+                                                    <?= htmlspecialchars($tagBadge['label']) ?>
+                                                </span>
+                                            <?php endif; ?>
+                                        </div>
                                     <?php endif; ?>
 
                                     <a href="/pages/shop/products/product.php?id=<?= $pid; ?>" class="d-block">

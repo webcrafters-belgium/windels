@@ -3,6 +3,11 @@ function fetchFilteredProducts($conn, string $searchTerm, float $minPrice, float
     $searchSql = '';
     $params = [];
     $types = '';
+    $tagSelect = "NULL AS tag";
+    $tagCheck = $conn->query("SHOW COLUMNS FROM products LIKE 'tag'");
+    if ($tagCheck && $tagCheck->num_rows > 0) {
+        $tagSelect = "p.tag";
+    }
 
     // 🔍 Zoekterm
     if (!empty($searchTerm)) {
@@ -49,6 +54,7 @@ function fetchFilteredProducts($conn, string $searchTerm, float $minPrice, float
             p.price,
             p.stock_quantity,
             p.stock_status,
+            $tagSelect,
             img.image_path,
             img.webp_path
         FROM products p

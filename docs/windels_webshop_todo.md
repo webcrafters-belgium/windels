@@ -177,3 +177,6 @@ panel should be technically stable and production‑ready.
 - Admin couponbeheer is bewust nog niet aangepast (volgens prioriteit: eerst www).
 - 2026-03-09 (www): Logout-flow hersteld (session cookie + session destroy + redirect naar /pages/account/login/), inclusief compat-route `/pages/account/logout.php`.
 - 2026-03-09 (www): Anti-spam honeypot ook toegevoegd aan `www/API/auth/register.php` (extra bescherming voor alternatieve registratie-endpoint).
+- 2026-03-09 (www): Product tags/badges toegevoegd op homepage, shop-grid en productdetail (`new` = "New in assortiment", `sale` = "Actie").
+- 2026-03-09 (www): Homepage uitgebreid met 2 extra secties: "Nieuwe producten" (created_at desc) en "Actie producten" (tag = sale).
+- Implementatie bevat fallback wanneer `products.tag` nog niet bestaat (geen fatale SQL error, sectie Actie blijft dan leeg).
