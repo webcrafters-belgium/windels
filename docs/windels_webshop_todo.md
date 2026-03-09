@@ -180,3 +180,5 @@ panel should be technically stable and production‑ready.
 - 2026-03-09 (www): Product tags/badges toegevoegd op homepage, shop-grid en productdetail (`new` = "New in assortiment", `sale` = "Actie").
 - 2026-03-09 (www): Homepage uitgebreid met 2 extra secties: "Nieuwe producten" (created_at desc) en "Actie producten" (tag = sale).
 - Implementatie bevat fallback wanneer `products.tag` nog niet bestaat (geen fatale SQL error, sectie Actie blijft dan leeg).
+- 2026-03-09 (admin): 404 op instellingen/openingstijden opgelost via compat-route `www/admin/pages/settings/index.php` -> `/admin/config/`.
+- Root-cause: navigatie verwees naar niet-bestaande settings pagina onder `/admin/pages/settings/` terwijl werkende module onder `/admin/config/` staat.
