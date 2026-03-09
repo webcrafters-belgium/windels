@@ -182,3 +182,5 @@ panel should be technically stable and production‑ready.
 - Implementatie bevat fallback wanneer `products.tag` nog niet bestaat (geen fatale SQL error, sectie Actie blijft dan leeg).
 - 2026-03-09 (admin): 404 op instellingen/openingstijden opgelost via compat-route `www/admin/pages/settings/index.php` -> `/admin/config/`.
 - Root-cause: navigatie verwees naar niet-bestaande settings pagina onder `/admin/pages/settings/` terwijl werkende module onder `/admin/config/` staat.
+- 2026-03-09 (admin): Blog image upload hersteld door add/edit uploadpad te aligneren op `/images/uploads/blog/`.
+- 2026-03-09 (admin): Uploadflow verhard met map-write checks (`is_writable`) en upload-validatie (`is_uploaded_file`).

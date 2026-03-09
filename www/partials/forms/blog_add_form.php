@@ -50,7 +50,7 @@
 
     <div class="mb-3">
         <label for="image">Afbeelding (optioneel)</label>
-        <input type="file" name="image" id="image" class="form-control">
+        <input type="file" name="image" id="image" class="form-control" accept=".jpg,.jpeg,.png,.webp,image/jpeg,image/png,image/webp">
     </div>
 
     <button type="submit" class="btn btn-primary">Publiceren</button>

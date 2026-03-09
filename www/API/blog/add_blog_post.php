@@ -2,6 +2,11 @@
 require $_SERVER['DOCUMENT_ROOT'] . '/ini.inc';
 session_start();
 
+if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+    header("Location: /admin/pages/blogs/add.php");
+    exit;
+}
+
 $title   = $_POST['title'] ?? '';
 $content = $_POST['content'] ?? '';
 $author  = $_POST['author'] ?? 'Gast';
@@ -12,9 +17,16 @@ if (
     isset($_FILES['image']) &&
     $_FILES['image']['error'] === UPLOAD_ERR_OK
 ) {
-    $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/uploads/blog/';
+    // Zelfde pad als edit-flow zodat add/edit consistent blijven.
+    $uploadDir = $_SERVER['DOCUMENT_ROOT'] . '/images/uploads/blog/';
     if (!is_dir($uploadDir)) {
-        mkdir($uploadDir, 0755, true);
+        if (!mkdir($uploadDir, 0755, true) && !is_dir($uploadDir)) {
+            exit('Uploadmap kon niet worden aangemaakt.');
+        }
+    }
+
+    if (!is_writable($uploadDir)) {
+        exit('Uploadmap is niet schrijfbaar.');
     }
 
     $ext = strtolower(pathinfo($_FILES['image']['name'], PATHINFO_EXTENSION));
@@ -27,9 +39,10 @@ if (
     $imageName   = uniqid('blog_', true) . '.' . $ext;
     $imageTarget = $uploadDir . $imageName;
 
-    if (move_uploaded_file($_FILES['image']['tmp_name'], $imageTarget)) {
-        // DIT pad moet exact overeenkomen met de map hierboven
-        $imagePath = '/uploads/blog/' . $imageName;
+    if (is_uploaded_file($_FILES['image']['tmp_name']) && move_uploaded_file($_FILES['image']['tmp_name'], $imageTarget)) {
+        $imagePath = '/images/uploads/blog/' . $imageName;
+    } else {
+        exit('Afbeelding uploaden is mislukt.');
     }
 }
 
